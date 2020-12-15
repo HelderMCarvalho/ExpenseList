@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasREST", "DespesasREST\DespesasREST.csproj", "{59F425A1-8CD3-4863-AB3D-56EBC6F9DD5E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59F425A1-8CD3-4863-AB3D-56EBC6F9DD5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59F425A1-8CD3-4863-AB3D-56EBC6F9DD5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59F425A1-8CD3-4863-AB3D-56EBC6F9DD5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59F425A1-8CD3-4863-AB3D-56EBC6F9DD5E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ADE23A9F-9A5A-4B0A-B393-964961AD6D3B}
+	EndGlobalSection
+EndGlobal
