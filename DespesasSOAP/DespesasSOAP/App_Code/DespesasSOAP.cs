@@ -1,21 +1,36 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 
-// NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "DespesasSOAP" in code, svc and config file together.
 public class DespesasSOAP : IDespesasSOAP
 {
-    public string GetData(int value) {
-        return string.Format("You entered: {0}", value);
-    }
 
-    public CompositeType GetDataUsingDataContract(CompositeType composite) {
-        if(composite == null)
+    bool IDespesasSOAP.addDespesa(string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
+
+        DbConnect db = new DbConnect();
+        if(db.IsConnect() && hashUser != null && db.checkUser(hashUser))
         {
-            throw new ArgumentNullException("composite");
+            if(nome != null && descricao != null && dataHoraCriacao != null)
+            {
+                var query = "INSERT INTO `despesas`.`despesas` (`nome`, `descricao`, `valEur`, `valUsd`, `utilizador_id`) VALUES (@nome, @desc, @valEuro, @valUsd, @utilizador);";
+                var cmd = new MySqlCommand(query, db.Connection);
+                cmd.Parameters.AddWithValue("?nome", nome);
+                cmd.Parameters.AddWithValue("?desc", descricao);
+                cmd.Parameters.AddWithValue("?dataHoraCriacao", dataHoraCriacao);
+                cmd.Parameters.AddWithValue("?valEuro", valEuro);
+                cmd.Parameters.AddWithValue("?valUsd", valUsd);
+                cmd.Parameters.AddWithValue("?utilizador", hashUser);
+                var reader = cmd.ExecuteReader();
+
+                db.Connection.Close();
+                return true;
+            }
         }
-        if(composite.BoolValue)
-        {
-            composite.StringValue += "Suffix";
-        }
-        return composite;
+        db.Connection.Close();
+        return false;
+
+    }
+    bool IDespesasSOAP.updateDespesa(int id, string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
+
+        return true;
     }
 }

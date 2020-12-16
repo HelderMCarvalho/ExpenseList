@@ -1,37 +1,15 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
 using System.ServiceModel;
 
 [ServiceContract]
 public interface IDespesasSOAP
 {
 
-    [OperationContract]
-    string GetData(int value);
+    [OperationContract(Name = "AdicionarDespesa")]
+    bool addDespesa(string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser);
 
-    [OperationContract]
-    CompositeType GetDataUsingDataContract(CompositeType composite);
 
-    // TODO: Add your service operations here
-}
+    [OperationContract(Name = "EditarDespesa")]
+    bool updateDespesa(int id, string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser);
 
-// Use a data contract as illustrated in the sample below to add composite types to service operations.
-[DataContract]
-public class CompositeType
-{
-    bool boolValue = true;
-    string stringValue = "Hello ";
-
-    [DataMember]
-    public bool BoolValue
-    {
-        get { return boolValue; }
-        set { boolValue = value; }
-    }
-
-    [DataMember]
-    public string StringValue
-    {
-        get { return stringValue; }
-        set { stringValue = value; }
-    }
 }
