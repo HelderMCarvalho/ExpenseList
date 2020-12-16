@@ -1,4 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
 
 public class DbConnect
 {
@@ -7,11 +9,12 @@ public class DbConnect
     public string DatabaseName { get; set; }
     public string UserName { get; set; }
     public string Password { get; set; }
-
-
-
     public MySqlConnection Connection { get; set; }
 
+    /// <summary>
+    /// Check if connection to DB is open
+    /// </summary>
+    /// <returns>True: Success | False: Failure</returns>
     public bool isConnectionOpen() {
         this.init();
         if(Connection == null)
@@ -24,90 +27,161 @@ public class DbConnect
         return true;
     }
 
-    public bool executeOp(int op, Despesa desp, int id = 0) {
+    /// <summary>
+    /// Run a DB Operation by OperationID
+    /// 
+    ///     1 - Insert Expense
+    ///     2 - Update Expense
+    /// </summary>
+    /// <param name="op">Operation to execute</param>
+    /// <param name="expense">Expense that will be processed</param>
+    /// <param name="id">Id that is used to identify the expense that will be update. 0 used in case an insert operation</param>
+    /// <returns>True: Success | False: Failure</returns>
+    public bool runOperation(int op, Expense expense, int id = 0) {
 
-        if(isConnectionOpen() && desp.hashUser != null &&
-            existeUser(desp.hashUser) && desp.nome != null &&
-            desp.descricao != null && desp.dataHoraCriacao != null)
+        /**
+         * Test if:
+         * Conection with DB is open,
+         * User Exist,
+         * Desp Id Exist,
+         * Data is filled;
+         * */
+        if(isConnectionOpen() && hasUser(expense.hashUser) && expense.isRequestFilled())
         {
-            string query = ""; 
+            string query;
+            List<MySqlParameter> parameters = new List<MySqlParameter>();
+
+            // Diferent querys and parameters per OperationID
             switch(op)
             {
-                case 1: // Operação Criar
-                    query = "INSERT INTO `despesas`.`despesas` (`nome`, `descricao`, `valEur`, `valUsd`, `utilizador_id`) VALUES (@nome, @desc, @valEuro, @valUsd, @utilizador);";
+                case 1: // Insert
+                    query = "INSERT INTO `despesas_isi`.`despesas` (`nome`, `descricao`, `valEur`, `valUsd`, `utilizador_id`) " +
+                "VALUES (@nome, @desc, @valEuro, @valUsd, @utilizador);";
+                    parameters.Add(new MySqlParameter("?utilizador", expense.hashUser));
                     break;
-                case 2: // Operação Update
-                    query = "UPDATE `despesas`.`despesas` SET `nome` = @nome, `descricao` = @desc, `valEur` = @valEuro, `valUsd` = @valUsd WHERE(`id` = @id);";
+                case 2: // Update
+                    // Can this user update expense?
+                    if(id != 0 && expense.canUpdate(id, expense.hashUser) && expense.hasExpense(id))
+                    {
+                        query = "UPDATE `despesas_isi`.`despesas` " +
+                       "SET `nome` = @nome, `descricao` = @desc, `valEur` = @valEuro, `valUsd` = @valUsd WHERE(`id` = @id);";
+                        parameters.Add(new MySqlParameter("?id", id));
+                    }
+                    else
+                    {
+                        return false;
+                    }
                     break;
+                default: return false;
             }
-            MySqlCommand cmd = new MySqlCommand(query, Connection);
 
-            switch(op)
-            {
-                case 1: // Operação Criar
-                    cmd.Parameters.AddWithValue("?utilizador", desp.hashUser);
-                    break;
-                case 2: // Operação Update
-                    cmd.Parameters.AddWithValue("?id", id);
-                    break;
-            }
+            // Generic parameters for all ops
+            parameters.Add(new MySqlParameter("?nome", expense.nome));
+            parameters.Add(new MySqlParameter("?desc", expense.descricao));
+            parameters.Add(new MySqlParameter("?dataHoraCriacao", expense.dataHoraCriacao));
+            parameters.Add(new MySqlParameter("?valEuro", expense.valEuro));
+            parameters.Add(new MySqlParameter("?valUsd", expense.valUsd));
 
-            cmd.Parameters.AddWithValue("?nome", desp.nome);
-            cmd.Parameters.AddWithValue("?desc", desp.descricao);
-            cmd.Parameters.AddWithValue("?dataHoraCriacao", desp.dataHoraCriacao);
-            cmd.Parameters.AddWithValue("?valEuro", desp.valEuro);
-            cmd.Parameters.AddWithValue("?valUsd", desp.valUsd);
-
-            var reader = cmd.ExecuteReader();
-
-            Connection.Close();
-            return true;
-
+            // Execute DB Op
+            return execOpWithStatus(query, parameters);
         }
         Connection.Close();
         return false;
     }
 
+    /// <summary>
+    /// Execute operation and a boolean
+    /// </summary>
+    /// <param name="query">SQL query</param>
+    /// <param name="parameters">Expense data that will be used on DB</param>
+    /// <returns>True: Success | False: Failure</returns>
+    public bool execOpWithStatus(string query, List<MySqlParameter> parameters) {
+        try
+        {
+            MySqlCommand cmd = new MySqlCommand(query, Connection);
+            parameters.ForEach(paramn =>
+            {
+                cmd.Parameters.Add(paramn);
+            });
+            var reader = cmd.ExecuteReader();
+            reader.Close();
+            return true;
+        }
+        catch(Exception e)
+        {
+            Console.Write(e);
+            return false;
+        }
+    }
+    /// <summary>
+    /// Execute operation and return data
+    /// </summary>
+    /// <param name="query">SQL Query</param>
+    /// <param name="parameters">Expense data that will be used on DB</param>
+    /// <returns>MySqlDataReader that allows to read the data retrieved from DB</returns>
+    public MySqlDataReader execOpWithData(string query, List<MySqlParameter> parameters) {
+        try
+        {
+            MySqlCommand cmd = new MySqlCommand(query, Connection);
+            parameters.ForEach(paramn =>
+            {
+                cmd.Parameters.Add(paramn);
+            });
+            return cmd.ExecuteReader();
+        }
+        catch(Exception e)
+        {
+            Console.Write(e);
+            return null;
+        }
+    }
 
-
-
+    /// <summary>
+    /// Close DB Connection
+    /// </summary>
     public void Close() {
         Connection.Close();
     }
 
+    /// <summary>
+    /// Set the default DB Config
+    /// </summary>
     public void init() {
 
         this.Server = "localhost";
-        this.DatabaseName = "despesas";
+        this.DatabaseName = "despesas_isi";
         this.UserName = "root";
         this.Password = "";
 
     }
 
+    /// <summary>
+    /// Test if the user exist
+    /// </summary>
+    /// <param name="hashUser">Unique data that identify only one user</param>
+    /// <returns>True: Has User | False: User doest Exist </returns>
+    public bool hasUser(string hashUser) {
 
-    public bool existeUser(string hashUser) {
+        string query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
 
-        string query = "SELECT count(emailSha) as existeUser FROM despesas.utilizadores WHERE despesas.utilizadores.emailSha = @hashUser;";
-        var cmd = new MySqlCommand(query, this.Connection);
+        List<MySqlParameter> parameters = new List<MySqlParameter>();
+        parameters.Add(new MySqlParameter("@hashUser", hashUser));
+        var reader = execOpWithData(query, parameters);
 
-        cmd.Parameters.AddWithValue("@hashUser", hashUser);
-        var reader = cmd.ExecuteReader();
-
-        if(reader.HasRows)
+        try
         {
-            int qtdUser = 0;
-            while(reader.Read())
-            {
-                qtdUser = reader.GetInt32(0);
-            }
-            if(qtdUser > 0)
+            if(reader != null && reader.HasRows)
             {
                 reader.Close();
                 return true;
             }
+            reader.Close();
+            return false;
         }
-        reader.Close();
-        return false;
+        catch(Exception e)
+        {
+            return false;
+        }
     }
 
 }
