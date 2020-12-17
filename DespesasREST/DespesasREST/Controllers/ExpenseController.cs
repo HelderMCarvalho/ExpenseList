@@ -1,25 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 
 namespace DespesasREST.Controllers
 {
+    [Route("[controller]/{hashUser}")]
     [ApiController]
-    [Route("[controller]")]
     public class ExpenseController : ControllerBase
     {
         /// <summary>
         /// Get all Expenses
         /// </summary>
         /// <returns>JSON with all Exposes</returns>
-        [HttpGet]
-        public ActionResult<List<Expense>> getAll() {
+        [HttpGet("[action]")]
+        public ActionResult<List<Expense>> getAll(string hashUser) {
+            //TODO: GetAllByUser
             DbConnect dbConnect = new DbConnect();
             List<Expense> res = new List<Expense>();
             if(dbConnect.isConnectionOpen())
             {
+                if(!dbConnect.hasUser(hashUser))
+                    return new StatusCodeResult(401);
+
                 var query = "SELECT id,nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas;";
                 MySqlDataReader reader = dbConnect.execOpWithData(query, new List<MySqlParameter>());
                 try
@@ -35,8 +38,6 @@ namespace DespesasREST.Controllers
                            valEuro: reader.GetDecimal(4),
                            valUsd: reader.GetDecimal(5),
                            hashUser: reader.GetString(6)));
-
-
                         }
                     }
                     reader.Close();
@@ -44,35 +45,36 @@ namespace DespesasREST.Controllers
                 }
                 catch(Exception e)
                 {
-                    throw e;
+                    return new StatusCodeResult(500);
                 }
             }
             return res;
         }
-
 
         /// <summary>
         /// Delete an Expense by ID
         /// </summary>
         /// <param name="id">The expense that will be deleted</param>
         /// <returns>True: Success | False: Error</returns>
-        [HttpDelete("delete/{id}")]
-        public ActionResult<bool> delete(int id) {
+        [HttpDelete("[action]/{id}")]
+        public ActionResult<bool> delete(string hashUser, int id) {
 
-           DbConnect dbConnect = new DbConnect();
+            DbConnect dbConnect = new DbConnect();
             List<Expense> res = new List<Expense>();
             if(dbConnect.isConnectionOpen())
             {
+                // If user/expense invalid
+                if(!dbConnect.hasUser(hashUser) || !new Expense().hasExpense(id))
+                    return new StatusCodeResult(401);
+
                 var query = "DELETE FROM `despesas_isi`.`despesas` WHERE (`id` = @id);";
                 List<MySqlParameter> parameters = new List<MySqlParameter>();
-                parameters.Add(new MySqlParameter("@id",id));
-                return dbConnect.execOpWithStatus(query, parameters);
+                parameters.Add(new MySqlParameter("@id", id));
+                if(dbConnect.execOpWithStatus(query, parameters))
+                    return Ok();
+
             }
-            return false;
+            return new StatusCodeResult(500);
         }
-
-
-
-
     }
 }
