@@ -2,7 +2,6 @@
 
 public class ExpenseSOAP : IExpenseSOAP
 {
-
     bool IExpenseSOAP.addExpense(string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
         int op = 1; // Insert
         DbConnect db = new DbConnect();

@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "DespesasSOAP", "DespesasSOAP\", "{08FB3542-02AB-4B2E-86CE-3BB27DF508A4}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		ProjectReferences = "{0b99c678-31ce-414a-afeb-f2fdd1d91b6e}|DespesasLibrary.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58931"
 		Debug.AspNetCompiler.PhysicalPath = "DespesasSOAP\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58931\"
@@ -25,13 +26,22 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "DespesasSOAP", "DespesasSOA
 		DefaultWebSiteLanguage = "Visual C#"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasLibrary", "..\DespesasLibrary\DespesasLibrary\DespesasLibrary.csproj", "{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{08FB3542-02AB-4B2E-86CE-3BB27DF508A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{08FB3542-02AB-4B2E-86CE-3BB27DF508A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08FB3542-02AB-4B2E-86CE-3BB27DF508A4}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{08FB3542-02AB-4B2E-86CE-3BB27DF508A4}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
