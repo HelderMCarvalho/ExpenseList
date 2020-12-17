@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30711.63
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasLibrary", "DespesasLibrary\DespesasLibrary.csproj", "{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DespesasREST", "..\DespesasREST\DespesasREST\DespesasREST.csproj", "{7C9A528C-BB13-44E6-89D9-E338D1E32ACD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C9A528C-BB13-44E6-89D9-E338D1E32ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C9A528C-BB13-44E6-89D9-E338D1E32ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C9A528C-BB13-44E6-89D9-E338D1E32ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C9A528C-BB13-44E6-89D9-E338D1E32ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C6C82A86-5733-4CC0-B7B7-B5E431AAEE51}
+	EndGlobalSection
+EndGlobal
