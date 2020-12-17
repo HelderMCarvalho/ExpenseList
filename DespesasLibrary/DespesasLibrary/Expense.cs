@@ -56,12 +56,18 @@ public class Expense
 
             try
             {
-                if(reader != null && reader.HasRows)
+                if(reader != null)
                 {
-                    return true;
+                    if(reader.HasRows)
+                    {
+                        reader.Close();
+                        return true;
+                    }
+                    reader.Close();
                 }
-                reader.Close();
                 return false;
+            }
+            return false;
             }
             catch(Exception e)
             {
@@ -89,12 +95,15 @@ public class Expense
 
             try
             {
-                if(reader != null && reader.HasRows)
+                if(reader != null)
                 {
+                    if(reader.HasRows)
+                    {
+                        reader.Close();
+                        return true;
+                    }
                     reader.Close();
-                    return true;
                 }
-                reader.Close();
                 return false;
             }
             catch(Exception e)

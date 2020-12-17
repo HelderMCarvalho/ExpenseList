@@ -23,7 +23,6 @@ public class DbConnect
             Connection = new MySqlConnection(connstring);
             Connection.Open();
         }
-
         return true;
     }
 
@@ -163,19 +162,21 @@ public class DbConnect
     public bool hasUser(string hashUser) {
 
         string query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
-
         List<MySqlParameter> parameters = new List<MySqlParameter>();
         parameters.Add(new MySqlParameter("@hashUser", hashUser));
         var reader = execOpWithData(query, parameters);
 
         try
         {
-            if(reader != null && reader.HasRows)
+            if(reader != null)
             {
+                if(reader.HasRows)
+                {
+                    reader.Close();
+                    return true;
+                }
                 reader.Close();
-                return true;
             }
-            reader.Close();
             return false;
         }
         catch(Exception e)
