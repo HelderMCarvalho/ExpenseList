@@ -23,8 +23,10 @@ namespace DespesasREST.Controllers
                 if(!dbConnect.hasUser(hashUser))
                     return new StatusCodeResult(401);
 
-                var query = "SELECT id,nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas;";
-                MySqlDataReader reader = dbConnect.execOpWithData(query, new List<MySqlParameter>());
+                var query = "SELECT id,nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser;";
+                List<MySqlParameter> parameters = new List<MySqlParameter>();
+                parameters.Add(new MySqlParameter("@hashUser",hashUser));
+                MySqlDataReader reader = dbConnect.execOpWithData(query, parameters);
                 try
                 {
                     if(reader != null && reader.HasRows)
