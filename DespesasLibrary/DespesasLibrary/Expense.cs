@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 namespace DespesasLibrary
 {
-
-    /// <summary>
-    /// Summary description for Expense
-    /// </summary>
     public class Expense : ApiData
     {
         public string nome { get; set; }
@@ -17,7 +13,20 @@ namespace DespesasLibrary
         public decimal valUsd { get; set; }
         public string hashUser { get; set; }
 
+        /// <summary>
+        ///     Constructor
+        /// </summary>
         public Expense() { }
+
+        /// <summary>
+        ///     Constructor with data
+        /// </summary>
+        /// <param name="nome">Expense Name</param>
+        /// <param name="descricao">Expense Description</param>
+        /// <param name="dataHoraCriacao">Expense DateTime of creation</param>
+        /// <param name="valEuro">Expense EUR value</param>
+        /// <param name="valUsd">Expense USD value</param>
+        /// <param name="hashUser">Hash (ID) of the user that owns the Expense</param>
         public Expense(string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
             this.nome = nome;
             this.descricao = descricao;
@@ -28,19 +37,21 @@ namespace DespesasLibrary
         }
 
         /// <summary>
-        /// Check if the expense with this ID exist in DB
+        ///     Check if the Expense exists in DB
         /// </summary>
-        /// <param name="id">Unique data that identify only one expense</param>
-        /// <returns>True: Exist | False: Dont Exist </returns>
-        public bool hasExpense(string id) {
+        /// <param name="id">ID of the Expense to be updated</param>
+        /// <returns>
+        ///     <para>TRUE: Expense exists</para>
+        ///     <para>FALSE: Expense does not exist</para>
+        /// </returns>
+        public bool HasExpense(string id) {
             DbConnect db = new DbConnect();
-            if(db.isConnectionOpen())
+            if(db.IsConnectionOpen())
             {
                 string query = "SELECT id FROM despesas_isi.despesas where despesas_isi.despesas.id = @id;";
                 List<MySqlParameter> parameters = new List<MySqlParameter>();
                 parameters.Add(new MySqlParameter("@id", id));
-                var reader = db.execOpWithData(query, parameters);
-
+                MySqlDataReader reader = db.ExecSQLWithData(query, parameters);
                 try
                 {
                     if(reader != null)
@@ -54,7 +65,7 @@ namespace DespesasLibrary
                     }
                     return false;
                 }
-                catch(Exception e)
+                catch(Exception)
                 {
                     reader.Close();
                     return false;
