@@ -3,10 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DespesasWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Despesas" Width="1280" Height="720" WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize">
     <Grid>
-        
+        <DockPanel Name="EntrarPanel">
+            <Button Click="ButtonEntrar_Click" Content="Entrar" ToolTip="Entrar" HorizontalAlignment="Center"
+                    VerticalAlignment="Center" />
+        </DockPanel>
+        <DockPanel Name="DespesasPanel" Visibility="Collapsed">
+            <Button Click="ButtonSair_Click" Content="🚪" ToolTip="Sair" FontSize="15" Background="Transparent"
+                    BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </DockPanel>
     </Grid>
 </Window>
