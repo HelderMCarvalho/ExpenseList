@@ -1,8 +1,8 @@
-﻿using DespesasLibrary;
+﻿using System;
+using System.Collections.Generic;
+using DespesasLibrary;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 
 namespace DespesasREST.Controllers
 {
@@ -15,71 +15,70 @@ namespace DespesasREST.Controllers
         /// </summary>
         /// <returns>List of Expenses</returns>
         [HttpGet("[action]")]
-        public ActionResult<List<Expense>> GetAll(string hashUser) {
+        public ActionResult<List<Expense>> GetAll(string hashUser)
+        {
             DbConnect dbConnect = new DbConnect();
             List<Expense> res = new List<Expense>();
-            if(dbConnect.IsConnectionOpen())
-            {
-                if(!dbConnect.HasUser(hashUser))
-                    return new StatusCodeResult(401);
 
-                string query = "SELECT id, nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser;";
-                List<MySqlParameter> parameters = new List<MySqlParameter>
+            // Check if connection is opened
+            if (!dbConnect.IsConnectionOpen()) return res;
+
+            if (!dbConnect.HasUser(hashUser)) return new StatusCodeResult(401);
+
+            const string query =
+                "SELECT id, nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser;";
+            List<MySqlParameter> parameters = new List<MySqlParameter>
+            {
+                new("@hashUser", hashUser)
+            };
+            MySqlDataReader reader = dbConnect.ExecSqlWithData(query, parameters);
+            try
+            {
+                if (reader != null && reader.HasRows)
                 {
-                    new MySqlParameter("@hashUser", hashUser)
-                };
-                MySqlDataReader reader = dbConnect.ExecSQLWithData(query, parameters);
-                try
-                {
-                    if(reader != null && reader.HasRows)
+                    while (reader.Read())
                     {
-                        while(reader.Read())
-                        {
-                            res.Add(new Expense(
-                            nome: reader.GetString(1),
-                            descricao: reader.GetString(2),
-                            dataHoraCriacao: reader.GetDateTime(3),
-                            valEuro: reader.GetDecimal(4),
-                            valUsd: reader.GetDecimal(5),
-                            hashUser: reader.GetString(6)));
-                        }
+                        res.Add(new Expense(reader.GetString(0),reader.GetString(1), reader.GetString(2), reader.GetDateTime(3),
+                            reader.GetDecimal(4), reader.GetDecimal(5), reader.GetString(6)));
                     }
-                    reader.Close();
                 }
-                catch(Exception)
-                {
-                    return new StatusCodeResult(500);
-                }
+
+                reader?.Close();
             }
+            catch (Exception)
+            {
+                return new StatusCodeResult(500);
+            }
+
             return res;
         }
 
         /// <summary>
         ///     Delete an Expense by ID
         /// </summary>
+        /// <param name="hashUser">Hashed email of the User</param>
         /// <param name="id">ID of the Expense to be deleted</param>
         /// <returns>
         ///     <para>TRUE: Expense deleted successfully</para>
         ///     <para>FALSE: Expense not deleted successfully</para>
         /// </returns>
         [HttpDelete("[action]/{id}")]
-        public ActionResult<bool> Delete(string hashUser, string id) {
+        public ActionResult<bool> Delete(string hashUser, string id)
+        {
             DbConnect dbConnect = new DbConnect();
-            if(dbConnect.IsConnectionOpen())
-            {
-                // Check if User or Expense exist
-                if(!dbConnect.HasUser(hashUser) || !new Expense().HasExpense(id))
-                    return new StatusCodeResult(401);
 
-                var query = "DELETE FROM despesas_isi.despesas WHERE (id = @id);";
-                List<MySqlParameter> parameters = new List<MySqlParameter>
-                {
-                    new MySqlParameter("@id", id)
-                };
-                if(dbConnect.ExecSQLWithStatus(query, parameters))
-                    return Ok();
-            }
-            return new StatusCodeResult(500);
+            // Check if connection is opened
+            if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
+
+            // Check if User or Expense exist
+            if (!dbConnect.HasUser(hashUser) || !new Expense().HasExpense(id)) return new StatusCodeResult(401);
+
+            const string query = "DELETE FROM despesas_isi.despesas WHERE (id = @id);";
+            List<MySqlParameter> parameters = new List<MySqlParameter>
+            {
+                new("@id", id)
+            };
+            return dbConnect.ExecSqlWithStatus(query, parameters) ? Ok() : new StatusCodeResult(500);
         }
     }
 }

@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasWPF", "DespesasWPF\DespesasWPF.csproj", "{6CA624E7-B4F7-4DC7-AD5E-1B3A35BBCA31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasLibrary", "..\DespesasLibrary\DespesasLibrary\DespesasLibrary.csproj", "{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DespesasREST", "..\DespesasREST\DespesasREST\DespesasREST.csproj", "{F1C53BD1-C8FC-4BA3-AEE4-D1A134FD8611}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{6CA624E7-B4F7-4DC7-AD5E-1B3A35BBCA31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CA624E7-B4F7-4DC7-AD5E-1B3A35BBCA31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CA624E7-B4F7-4DC7-AD5E-1B3A35BBCA31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B99C678-31CE-414A-AFEB-F2FDD1D91B6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1C53BD1-C8FC-4BA3-AEE4-D1A134FD8611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1C53BD1-C8FC-4BA3-AEE4-D1A134FD8611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1C53BD1-C8FC-4BA3-AEE4-D1A134FD8611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1C53BD1-C8FC-4BA3-AEE4-D1A134FD8611}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

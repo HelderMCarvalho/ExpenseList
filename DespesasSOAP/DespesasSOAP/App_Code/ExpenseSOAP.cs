@@ -19,7 +19,7 @@ public class ExpenseSOAP : IExpenseSOAP
     bool IExpenseSOAP.AddExpense(string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
         int op = 1; // Insert
         DbConnect db = new DbConnect();
-        return db.RunOperation(op, new Expense(nome, descricao, dataHoraCriacao, valEuro, valUsd, hashUser));
+        return db.RunOperation(op, new Expense("", nome, descricao, dataHoraCriacao, valEuro, valUsd, hashUser));
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ public class ExpenseSOAP : IExpenseSOAP
     bool IExpenseSOAP.UpdateExpense(string id, string nome, string descricao, DateTime dataHoraCriacao, decimal valEuro, decimal valUsd, string hashUser) {
         int op = 2; // Update
         DbConnect db = new DbConnect();
-        return db.RunOperation(op, new Expense(nome, descricao, dataHoraCriacao, valEuro, valUsd, hashUser), id);
+        return db.RunOperation(op, new Expense(id, nome, descricao, dataHoraCriacao, valEuro, valUsd, hashUser), id);
     }
 
     /// <summary>

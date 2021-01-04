@@ -9,25 +9,24 @@ namespace DespesasREST
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration) {
-            Configuration = configuration;
+        public Startup(IConfiguration configuration)
+        {
         }
 
-        public IConfiguration Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services) {
-
+        public void ConfigureServices(IServiceCollection services)
+        {
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "DespesasREST", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "DespesasREST", Version = "v1"});
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
-            if(env.IsDevelopment())
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
@@ -35,15 +34,9 @@ namespace DespesasREST
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

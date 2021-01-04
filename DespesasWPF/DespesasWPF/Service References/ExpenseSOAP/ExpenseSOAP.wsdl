@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tns="http://tempuri.org/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" name="ExpenseSOAP" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:58931/Service.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:58931/Service.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IExpenseSOAP_AddExpense_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddExpense" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_AddExpense_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddExpenseResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_UpdateExpense_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateExpense" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_UpdateExpense_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateExpenseResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_AddUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddUser" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_AddUser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddUserResponse" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_UpdateUser_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateUser" />
+  </wsdl:message>
+  <wsdl:message name="IExpenseSOAP_UpdateUser_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateUserResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IExpenseSOAP">
+    <wsdl:operation name="AddExpense">
+      <wsdl:input wsaw:Action="http://tempuri.org/IExpenseSOAP/AddExpense" message="tns:IExpenseSOAP_AddExpense_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IExpenseSOAP/AddExpenseResponse" message="tns:IExpenseSOAP_AddExpense_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateExpense">
+      <wsdl:input wsaw:Action="http://tempuri.org/IExpenseSOAP/UpdateExpense" message="tns:IExpenseSOAP_UpdateExpense_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IExpenseSOAP/UpdateExpenseResponse" message="tns:IExpenseSOAP_UpdateExpense_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddUser">
+      <wsdl:input wsaw:Action="http://tempuri.org/IExpenseSOAP/AddUser" message="tns:IExpenseSOAP_AddUser_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IExpenseSOAP/AddUserResponse" message="tns:IExpenseSOAP_AddUser_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUser">
+      <wsdl:input wsaw:Action="http://tempuri.org/IExpenseSOAP/UpdateUser" message="tns:IExpenseSOAP_UpdateUser_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IExpenseSOAP/UpdateUserResponse" message="tns:IExpenseSOAP_UpdateUser_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IExpenseSOAP" type="tns:IExpenseSOAP">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="AddExpense">
+      <soap:operation soapAction="http://tempuri.org/IExpenseSOAP/AddExpense" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateExpense">
+      <soap:operation soapAction="http://tempuri.org/IExpenseSOAP/UpdateExpense" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddUser">
+      <soap:operation soapAction="http://tempuri.org/IExpenseSOAP/AddUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateUser">
+      <soap:operation soapAction="http://tempuri.org/IExpenseSOAP/UpdateUser" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ExpenseSOAP">
+    <wsdl:port name="BasicHttpBinding_IExpenseSOAP" binding="tns:BasicHttpBinding_IExpenseSOAP">
+      <soap:address location="http://localhost:58931/Service.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

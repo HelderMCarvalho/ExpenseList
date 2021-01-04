@@ -1,7 +1,7 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 
 namespace DespesasLibrary
 {
@@ -14,13 +14,15 @@ namespace DespesasLibrary
         ///     <para>TRUE: All fields are filled</para>
         ///     <para>FALSE: Some fields are not field</para>
         /// </returns>
-        public virtual bool IsRequestFilled() {
+        public bool IsRequestFilled()
+        {
             bool filled = true;
-            foreach(PropertyInfo prop in GetType().GetProperties())
+            foreach (PropertyInfo prop in GetType().GetProperties())
             {
                 object x = prop.GetValue(this);
                 filled = x != null;
             }
+
             return filled;
         }
 
@@ -34,43 +36,45 @@ namespace DespesasLibrary
         ///     <para>TRUE: The User can update the Expense</para>
         ///     <para>FALSE: The User cant update the Expense</para>
         /// </returns>
-        public virtual bool CanUpdate(string despesaId, string hashUser) {
+        public bool CanUpdate(string despesaId, string hashUser)
+        {
             DbConnect db = new DbConnect();
-            if(db.IsConnectionOpen())
-            {
-                List<MySqlParameter> parameters = new List<MySqlParameter>();
-                string query;
-                if(GetType() == typeof(Expense))
-                {
-                    query = "SELECT id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser AND despesas_isi.despesas.id = @id;";
-                    parameters.Add(new MySqlParameter("@id", despesaId));
-                }
-                else
-                {
-                    query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
-                }
-                parameters.Add(new MySqlParameter("@hashUser", hashUser));
 
-                MySqlDataReader reader = db.ExecSQLWithData(query, parameters);
-                try
-                {
-                    if(reader != null)
-                    {
-                        if(reader.HasRows)
-                        {
-                            reader.Close();
-                            return true;
-                        }
-                        reader.Close();
-                    }
-                    return false;
-                }
-                catch(Exception)
-                {
-                    return false;
-                }
+            // If connection not opened
+            if (!db.IsConnectionOpen()) return false;
+
+            List<MySqlParameter> parameters = new List<MySqlParameter>();
+            string query;
+            if (GetType() == typeof(Expense))
+            {
+                query =
+                    "SELECT id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser AND despesas_isi.despesas.id = @id;";
+                parameters.Add(new MySqlParameter("@id", despesaId));
             }
-            return false;
+            else
+            {
+                query =
+                    "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
+            }
+
+            parameters.Add(new MySqlParameter("@hashUser", hashUser));
+            MySqlDataReader reader = db.ExecSqlWithData(query, parameters);
+            try
+            {
+                if (reader == null) return false;
+                if (reader.HasRows)
+                {
+                    reader.Close();
+                    return true;
+                }
+
+                reader.Close();
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
     }
 }

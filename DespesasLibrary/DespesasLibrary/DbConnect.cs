@@ -1,21 +1,22 @@
-﻿using MySql.Data.MySqlClient;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace DespesasLibrary
 {
     public class DbConnect
     {
-        public string Server { get; set; }
-        public string DatabaseName { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public MySqlConnection Connection { get; set; }
+        private string Server { get; set; }
+        private string DatabaseName { get; set; }
+        private string UserName { get; set; }
+        private string Password { get; set; }
+        private MySqlConnection Connection { get; set; }
 
         /// <summary>
         ///     Set the default DB configuration
         /// </summary>
-        public void Init() {
+        private void Init()
+        {
             Server = "localhost";
             DatabaseName = "despesas_isi";
             UserName = "root";
@@ -25,7 +26,8 @@ namespace DespesasLibrary
         /// <summary>
         ///     Close DB Connection
         /// </summary>
-        public void Close() {
+        public void Close()
+        {
             Connection.Close();
         }
 
@@ -35,14 +37,13 @@ namespace DespesasLibrary
         /// <returns>
         ///     TRUE: Connection is open
         /// </returns>
-        public bool IsConnectionOpen() {
+        public bool IsConnectionOpen()
+        {
             Init();
-            if(Connection == null)
-            {
-                string connstring = string.Format("Server={0}; database={1}; UID={2}; password={3}", Server, DatabaseName, UserName, Password);
-                Connection = new MySqlConnection(connstring);
-                Connection.Open();
-            }
+            if (Connection != null) return true;
+            string connstring = $"Server={Server}; database={DatabaseName}; UID={UserName}; password={Password}";
+            Connection = new MySqlConnection(connstring);
+            Connection.Open();
             return true;
         }
 
@@ -54,36 +55,35 @@ namespace DespesasLibrary
         ///     <para>TRUE: User exists</para>
         ///     <para>FALSE: User doest exist</para>
         /// </returns>
-        public bool HasUser(string hashUser) {
-            string query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
+        public bool HasUser(string hashUser)
+        {
+            const string query =
+                "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
             List<MySqlParameter> parameters = new List<MySqlParameter>
             {
                 new MySqlParameter("@hashUser", hashUser)
             };
-            MySqlDataReader reader = ExecSQLWithData(query, parameters);
+            MySqlDataReader reader = ExecSqlWithData(query, parameters);
             try
             {
-                if(reader != null)
+                if (reader == null) return false;
+                if (reader.HasRows)
                 {
-                    if(reader.HasRows)
-                    {
-                        reader.Close();
-                        return true;
-                    }
                     reader.Close();
+                    return true;
                 }
+
+                reader.Close();
                 return false;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return false;
             }
         }
 
         /// <summary>
-        ///     Run a DB Operation by OperationID
-        ///         1 - Insert
-        ///         2 - Update
+        ///     Run a DB Operation by Type of Data (Expense or User)
         /// </summary>
         /// <param name="op">Operation to execute</param>
         /// <param name="data">Data that will be processed</param>
@@ -92,14 +92,13 @@ namespace DespesasLibrary
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
         /// </returns>
-        public bool RunOperation(int op, ApiData data, string id = "") {
+        public bool RunOperation(int op, ApiData data, string id = "")
+        {
             // If is an Expense operation
-            if(data.GetType() == typeof(Expense))
-            {
-                return RunOperationExpense(op, (Expense)data, id);
-            }
+            return data.GetType() == typeof(Expense)
+                ? RunOperationExpense(op, (Expense) data, id)
+                : RunOperationUser(op, (User) data, id);
             // If is an User operation
-            return runOperationUser(op, (User)data, id);
         }
 
         /// <summary>
@@ -111,40 +110,37 @@ namespace DespesasLibrary
         ///     <para>TRUE: SQL executed successfully</para>
         ///     <para>FALSE: SQL not executed successfully</para>
         /// </returns>
-        public bool ExecSQLWithStatus(string query, List<MySqlParameter> parameters) {
+        public bool ExecSqlWithStatus(string query, List<MySqlParameter> parameters)
+        {
             try
             {
                 MySqlCommand cmd = new MySqlCommand(query, Connection);
-                parameters.ForEach(paramn =>
-                {
-                    cmd.Parameters.Add(paramn);
-                });
+                parameters.ForEach(paramn => { cmd.Parameters.Add(paramn); });
                 MySqlDataReader reader = cmd.ExecuteReader();
                 reader.Close();
                 return true;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return false;
             }
         }
+
         /// <summary>
         ///     Execute SQL and return a data
         /// </summary>
         /// <param name="query">SQL query to execute</param>
         /// <param name="parameters">Parameters to be added to the SQL query</param>
         /// <returns>MySqlDataReader that allows to read the data retrieved from DB</returns>
-        public MySqlDataReader ExecSQLWithData(string query, List<MySqlParameter> parameters) {
+        public MySqlDataReader ExecSqlWithData(string query, List<MySqlParameter> parameters)
+        {
             try
             {
                 MySqlCommand cmd = new MySqlCommand(query, Connection);
-                parameters.ForEach(paramn =>
-                {
-                    cmd.Parameters.Add(paramn);
-                });
+                parameters.ForEach(paramn => { cmd.Parameters.Add(paramn); });
                 return cmd.ExecuteReader();
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -155,35 +151,37 @@ namespace DespesasLibrary
         /// </summary>
         /// <param name="op">Operation to execute</param>
         /// <param name="data">Data to add to the SQL query</param>
-        /// <param name="id">ID of the Expense to be updated (only used on update)</param>                   TODO: MUDAR PARA INT????
+        /// <param name="id">ID of the Expense to be updated (only used on update)</param>  TODO: MUDAR PARA INT????
         /// <returns>
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
         /// </returns>
-        private bool RunOperationExpense(int op, Expense data, string id = "") {
-            /**
-            * Test if:
-            *   Connection with DB is open,
-            *   User Exist,
-            *   Expense ID Exist,                                                                            TODO: NÃO ESTÁ A VERIFICAR ISTO
-            *   Data is filled;
-            * */
-            if(IsConnectionOpen() && HasUser(data.hashUser) && data.IsRequestFilled())
+        private bool RunOperationExpense(int op, Expense data, string id = "")
+        {
+            /*
+             Test if:
+                Connection with DB is open,
+                User Exist,
+                Expense ID Exist,   TODO: NÃO ESTÁ A VERIFICAR ISTO
+                Data is filled;
+            */
+
+            if (IsConnectionOpen() && HasUser(data.HashUser) && data.IsRequestFilled())
             {
                 string query;
                 List<MySqlParameter> parameters = new List<MySqlParameter>();
 
                 // Different query's and parameters per OperationID
-                switch(op)
+                switch (op)
                 {
                     case 1: // Insert
                         query = "INSERT INTO despesas_isi.despesas (nome, descricao, valEur, valUsd, utilizador_id) " +
                                 "VALUES (@nome, @desc, @valEuro, @valUsd, @utilizador);";
-                        parameters.Add(new MySqlParameter("?utilizador", data.hashUser));
+                        parameters.Add(new MySqlParameter("?utilizador", data.HashUser));
                         break;
                     case 2: // Update
                         // Can this user update this Expense?
-                        if(id != "" && data.CanUpdate(id, data.hashUser) && data.HasExpense(id))
+                        if (id != "" && data.CanUpdate(id, data.HashUser) && data.HasExpense(id))
                         {
                             query = "UPDATE despesas_isi.despesas " +
                                     "SET nome = @nome, descricao = @desc, valEur = @valEuro, valUsd = @valUsd WHERE(id = @id);";
@@ -193,20 +191,22 @@ namespace DespesasLibrary
                         {
                             return false;
                         }
+
                         break;
                     default: return false;
                 }
 
                 // Generic parameters for all ops
-                parameters.Add(new MySqlParameter("?nome", data.nome));
-                parameters.Add(new MySqlParameter("?desc", data.descricao));
-                parameters.Add(new MySqlParameter("?dataHoraCriacao", data.dataHoraCriacao));
-                parameters.Add(new MySqlParameter("?valEuro", data.valEuro));
-                parameters.Add(new MySqlParameter("?valUsd", data.valUsd));
+                parameters.Add(new MySqlParameter("?nome", data.Nome));
+                parameters.Add(new MySqlParameter("?desc", data.Descricao));
+                parameters.Add(new MySqlParameter("?dataHoraCriacao", data.DataHoraCriacao));
+                parameters.Add(new MySqlParameter("?valEuro", data.ValEur));
+                parameters.Add(new MySqlParameter("?valUsd", data.ValUsd));
 
                 // Execute DB Op
-                return ExecSQLWithStatus(query, parameters);
+                return ExecSqlWithStatus(query, parameters);
             }
+
             Connection.Close();
             return false;
         }
@@ -221,47 +221,54 @@ namespace DespesasLibrary
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
         /// </returns>
-        private bool runOperationUser(int op, User data, string id = "") {
-            /**
-            * Test if:
-            *   Connection with DB is open,
-            *   User Exists,                                                                     TODO: NÃO ESTÁ A VERIFICAR ISTO
-            *   Expense Exists,                                                                  TODO: NÃO ESTÁ A VERIFICAR ISTO
-            *   Data is filled;
-            * */
-            if(IsConnectionOpen() && data.IsRequestFilled())
+        private bool RunOperationUser(int op, User data, string id = "")
+        {
+            /*
+             Test if:
+                Connection with DB is open,
+                User Exists     TODO: NÃO ESTÁ A VERIFICAR ISTO
+                Expense Exists      TODO: NÃO ESTÁ A VERIFICAR ISTO
+                Data is filled;
+            */
+
+            if (IsConnectionOpen() && data.IsRequestFilled())
             {
                 string query;
                 List<MySqlParameter> parameters = new List<MySqlParameter>();
 
                 // Different query's and parameters per OperationID
-                switch(op)
+                switch (op)
                 {
                     case 1: // Insert
-                        query = "INSERT INTO despesas_isi.utilizadores (emailSha, moedaPadrao) VALUES (@emailSha, @moedaPadrao);";
+                        query =
+                            "INSERT INTO despesas_isi.utilizadores (emailSha, moedaPadrao) VALUES (@emailSha, @moedaPadrao);";
                         break;
                     case 2: // Update
                         // Can this User update this User (he can only update himself)?
-                        if(id != "" && data.CanUpdate("", id))
+                        if (id != "" && data.CanUpdate("", id))
                         {
-                            query = "UPDATE despesas_isi.utilizadores SET emailSha = @emailSha, moedaPadrao = @moedaPadrao WHERE (emailSha = @id);";
+                            // TODO: Não funciona quando queremos mudar de SHA porque não podemos mudar uma coluna e fazer WHERE dessa mesma coluna (adicionar Id no Utilizador)
+                            query =
+                                "UPDATE despesas_isi.utilizadores SET emailSha = @emailSha, moedaPadrao = @moedaPadrao WHERE (emailSha = @id);";
                             parameters.Add(new MySqlParameter("?id", id));
                         }
                         else
                         {
                             return false;
                         }
+
                         break;
                     default: return false;
                 }
 
                 // Generic parameters for all ops
-                parameters.Add(new MySqlParameter("?emailSha", data.emailSha));
-                parameters.Add(new MySqlParameter("?moedaPadrao", data.moedaPadrao));
+                parameters.Add(new MySqlParameter("?emailSha", data.EmailSha));
+                parameters.Add(new MySqlParameter("?moedaPadrao", data.MoedaPadrao));
 
                 // Execute DB Op
-                return ExecSQLWithStatus(query, parameters);
+                return ExecSqlWithStatus(query, parameters);
             }
+
             Connection.Close();
             return false;
         }

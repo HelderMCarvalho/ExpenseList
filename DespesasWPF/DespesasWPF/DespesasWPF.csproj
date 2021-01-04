@@ -38,7 +38,9 @@
         <Reference Include="System.ComponentModel.DataAnnotations" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
+        <Reference Include="System.Runtime.Serialization" />
         <Reference Include="System.Security" />
+        <Reference Include="System.ServiceModel" />
         <Reference Include="System.Xml" />
         <Reference Include="System.Xaml">
             <RequiredTargetFramework>4.0</RequiredTargetFramework>
@@ -52,6 +54,12 @@
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
         </ApplicationDefinition>
+        <Compile Include="Service References\ExpenseSOAP\ExpenseSOAP.cs">
+          <AutoGen>True</AutoGen>
+          <DesignTime>True</DesignTime>
+          <DependentUpon>ExpenseSOAP.svcmap</DependentUpon>
+        </Compile>
+        <Compile Include="SortAdorner.cs" />
         <Compile Include="TokenCacheHelper.cs" />
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
@@ -82,6 +90,15 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />
+        <None Include="Service References\ExpenseSOAP\ExpenseSOAP.svcmap">
+          <Generator>WCF Proxy Generator</Generator>
+          <LastGenOutput>ExpenseSOAP.cs</LastGenOutput>
+        </None>
+        <None Include="Service References\ExpenseSOAP\ExpenseSOAP.webref" />
+        <None Include="Service References\ExpenseSOAP\ExpenseSOAP.wsdl" />
+        <None Include="Service References\ExpenseSOAP\Service.disco" />
+        <None Include="Service References\ExpenseSOAP\Service.xsd" />
+        <None Include="Service References\ExpenseSOAP\Service0.xsd" />
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="Microsoft.Identity.Client" Version="4.24.0" />
@@ -96,6 +113,18 @@
       <PackageReference Include="System.Security.Cryptography.Encoding" Version="4.3.0" />
       <PackageReference Include="System.Security.Cryptography.Primitives" Version="4.3.0" />
       <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
+    </ItemGroup>
+    <ItemGroup>
+      <WCFMetadata Include="Service References" />
+    </ItemGroup>
+    <ItemGroup>
+      <WCFMetadataStorage Include="Service References\ExpenseSOAP" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\DespesasLibrary\DespesasLibrary\DespesasLibrary.csproj">
+        <Project>{0b99c678-31ce-414a-afeb-f2fdd1d91b6e}</Project>
+        <Name>DespesasLibrary</Name>
+      </ProjectReference>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
