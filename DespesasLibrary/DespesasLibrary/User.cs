@@ -1,4 +1,8 @@
-﻿namespace DespesasLibrary
+﻿using System;
+using System.Collections.Generic;
+using MySql.Data.MySqlClient;
+
+namespace DespesasLibrary
 {
     public class User : ApiData
     {
@@ -21,6 +25,28 @@
         {
             EmailSha = emailSha;
             MoedaPadrao = moedaPadrao;
+        }
+
+
+        public void SetUser()
+        {
+            DbConnect dbConnect = new DbConnect();
+            if (dbConnect.IsConnectionOpen())
+            {
+                const string query =
+                    "SELECT emailSha, moedaPadrao FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
+                List<MySqlParameter> parameters = new List<MySqlParameter>
+                {
+                    new MySqlParameter("@hashUser", EmailSha)
+                };
+                MySqlDataReader reader = dbConnect.ExecSqlWithData(query, parameters);
+                if (reader != null && reader.HasRows && reader.Read())
+                {
+                    EmailSha = reader.GetString(0);
+                    MoedaPadrao = reader.GetString(1);
+                    reader.Close();
+                }
+            }
         }
     }
 }

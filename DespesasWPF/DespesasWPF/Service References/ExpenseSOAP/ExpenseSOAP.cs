@@ -36,10 +36,10 @@ namespace DespesasWPF.ExpenseSOAP
         System.Threading.Tasks.Task<bool> AddUserAsync(string emailSha, string moedaPadrao);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IExpenseSOAP/UpdateUser", ReplyAction="http://tempuri.org/IExpenseSOAP/UpdateUserResponse")]
-        bool UpdateUser(string id, string emailSha, string moedaPadrao);
+        bool UpdateUser(string emailSha, string moedaPadrao);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IExpenseSOAP/UpdateUser", ReplyAction="http://tempuri.org/IExpenseSOAP/UpdateUserResponse")]
-        System.Threading.Tasks.Task<bool> UpdateUserAsync(string id, string emailSha, string moedaPadrao);
+        System.Threading.Tasks.Task<bool> UpdateUserAsync(string emailSha, string moedaPadrao);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -106,14 +106,14 @@ namespace DespesasWPF.ExpenseSOAP
             return base.Channel.AddUserAsync(emailSha, moedaPadrao);
         }
         
-        public bool UpdateUser(string id, string emailSha, string moedaPadrao)
+        public bool UpdateUser(string emailSha, string moedaPadrao)
         {
-            return base.Channel.UpdateUser(id, emailSha, moedaPadrao);
+            return base.Channel.UpdateUser(emailSha, moedaPadrao);
         }
         
-        public System.Threading.Tasks.Task<bool> UpdateUserAsync(string id, string emailSha, string moedaPadrao)
+        public System.Threading.Tasks.Task<bool> UpdateUserAsync(string emailSha, string moedaPadrao)
         {
-            return base.Channel.UpdateUserAsync(id, emailSha, moedaPadrao);
+            return base.Channel.UpdateUserAsync(emailSha, moedaPadrao);
         }
     }
 }

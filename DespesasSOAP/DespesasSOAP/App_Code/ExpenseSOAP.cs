@@ -67,9 +67,13 @@ public class ExpenseSOAP : IExpenseSOAP
     ///     <para>TRUE - User updated successfully</para>
     ///     <para>FALSE - User not updated successfully</para>
     /// </returns>
-    bool IExpenseSOAP.UpdateUser(string id, string emailSha, string moedaPadrao) {                          // TODO: COLOCAR NUM FICHEIRO SÓ DE USER
+    bool IExpenseSOAP.UpdateUser(string emailSha, string moedaPadrao) {                          // TODO: COLOCAR NUM FICHEIRO SÓ DE USER
         int op = 2; // Update
         DbConnect db = new DbConnect();
-        return db.RunOperation(op, new User(emailSha, moedaPadrao), id);
+        return db.RunOperation(op, new User(emailSha, moedaPadrao));
     }
+
+
+
+
 }

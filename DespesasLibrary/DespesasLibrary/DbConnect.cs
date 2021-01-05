@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using MySql.Data.MySqlClient;
 
 namespace DespesasLibrary
@@ -97,7 +98,7 @@ namespace DespesasLibrary
             // If is an Expense operation
             return data.GetType() == typeof(Expense)
                 ? RunOperationExpense(op, (Expense) data, id)
-                : RunOperationUser(op, (User) data, id);
+                : RunOperationUser(op, (User) data);
             // If is an User operation
         }
 
@@ -175,8 +176,8 @@ namespace DespesasLibrary
                 switch (op)
                 {
                     case 1: // Insert
-                        query = "INSERT INTO despesas_isi.despesas (nome, descricao, valEur, valUsd, utilizador_id) " +
-                                "VALUES (@nome, @desc, @valEuro, @valUsd, @utilizador);";
+                        query =
+                            "INSERT INTO despesas_isi.despesas (nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id) VALUES (@nome, @desc, @dataHoraCriacao, @valEuro, @valUsd, @utilizador);";
                         parameters.Add(new MySqlParameter("?utilizador", data.HashUser));
                         break;
                     case 2: // Update
@@ -184,7 +185,7 @@ namespace DespesasLibrary
                         if (id != "" && data.CanUpdate(id, data.HashUser) && data.HasExpense(id))
                         {
                             query = "UPDATE despesas_isi.despesas " +
-                                    "SET nome = @nome, descricao = @desc, valEur = @valEuro, valUsd = @valUsd WHERE(id = @id);";
+                                    "SET nome = @nome, descricao = @desc,dataHoraCriacao = @dataHoraCriacao, valEur = @valEuro, valUsd = @valUsd WHERE(id = @id);";
                             parameters.Add(new MySqlParameter("?id", id));
                         }
                         else
@@ -221,7 +222,7 @@ namespace DespesasLibrary
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
         /// </returns>
-        private bool RunOperationUser(int op, User data, string id = "")
+        private bool RunOperationUser(int op, User data)
         {
             /*
              Test if:
@@ -245,12 +246,10 @@ namespace DespesasLibrary
                         break;
                     case 2: // Update
                         // Can this User update this User (he can only update himself)?
-                        if (id != "" && data.CanUpdate("", id))
+                        if (data.CanUpdate("", data.EmailSha))
                         {
-                            // TODO: Não funciona quando queremos mudar de SHA porque não podemos mudar uma coluna e fazer WHERE dessa mesma coluna (adicionar Id no Utilizador)
                             query =
-                                "UPDATE despesas_isi.utilizadores SET emailSha = @emailSha, moedaPadrao = @moedaPadrao WHERE (emailSha = @id);";
-                            parameters.Add(new MySqlParameter("?id", id));
+                                "UPDATE despesas_isi.utilizadores SET moedaPadrao = @moedaPadrao WHERE (emailSha = @emailSha);";
                         }
                         else
                         {
@@ -271,6 +270,32 @@ namespace DespesasLibrary
 
             Connection.Close();
             return false;
+        }
+
+        public int GetLastId(string nomeTabela, string hashUser)
+        {
+            string query = "SELECT MAX(id) FROM " + nomeTabela + " where utilizador_id = @hashUser";
+            List<MySqlParameter> parameters = new List<MySqlParameter>
+            {
+                new MySqlParameter("@hashUser", hashUser)
+            };
+            MySqlDataReader reader = ExecSqlWithData(query, parameters);
+            try
+            {
+                if (reader == null) return 0;
+                if (reader.HasRows && reader.Read())
+                {
+                    return reader.GetInt32(0);
+                }
+
+                reader.Close();
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
+            return 0;
         }
     }
 }

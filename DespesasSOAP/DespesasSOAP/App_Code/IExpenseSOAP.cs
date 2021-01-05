@@ -60,5 +60,6 @@ public interface IExpenseSOAP
     ///     <para>FALSE - User not updated successfully</para>
     /// </returns>
     [OperationContract(Name = "UpdateUser")]
-    bool UpdateUser(string id, string emailSha, string moedaPadrao);
+    bool UpdateUser(string emailSha, string moedaPadrao);
+
 }

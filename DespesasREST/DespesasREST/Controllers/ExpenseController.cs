@@ -80,5 +80,28 @@ namespace DespesasREST.Controllers
             };
             return dbConnect.ExecSqlWithStatus(query, parameters) ? Ok() : new StatusCodeResult(500);
         }
+
+        [HttpGet("[action]")]
+        public ActionResult<bool> HasUser(string hashUser)
+        {
+            DbConnect dbConnect = new DbConnect();
+
+            // Check if connection is opened
+            if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
+
+            return dbConnect.HasUser(hashUser);
+        }
+        
+        [HttpGet("[action]/{nomeTabela}")]
+        public ActionResult<int> GetLastId(string nomeTabela, string hashUser)
+        {
+            DbConnect dbConnect = new DbConnect();
+
+            // Check if connection is opened
+            if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
+
+            return dbConnect.GetLastId(nomeTabela, hashUser);
+        }
+        
     }
 }
