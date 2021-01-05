@@ -104,8 +104,8 @@ namespace DespesasWPF
             Api = new Api(UtilizadorLigado.EmailSha);
 
             // Get rates
-            EuroEDolar = Api.getUsdRatesToEuro();
-            DolarEEuro = Api.getEuroRatesToUsd();
+            EuroEDolar = Api.GetUsdRatesToEuro();
+            DolarEEuro = Api.GetEuroRatesToUsd();
 
             if (!Api.HasUser())
             {

@@ -76,8 +76,7 @@ namespace DespesasLibrary
         /// </returns>
         public bool HasUser(string hashUser)
         {
-            const string query =
-                "SELECT emailSha FROM despesas_isi.utilizadores WHERE emailSha = @hashUser;";
+            const string query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE emailSha = @hashUser;";
             List<MySqlParameter> parameters = new List<MySqlParameter>
             {
                 new MySqlParameter("@hashUser", hashUser)

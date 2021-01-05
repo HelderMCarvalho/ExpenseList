@@ -10,67 +10,94 @@ namespace DespesasWPF
 {
     public class Api
     {
-        HttpWebRequest request;
-        string url;
-        private string hashUser;
+        private HttpWebRequest _request;
+        private string _url;
+        private readonly string _hashUser;
 
-
+        /// <summary>
+        ///     Construtor
+        /// </summary>
+        /// <param name="hashUser"></param>
         public Api(string hashUser)
         {
-            this.hashUser = hashUser;
+            _hashUser = hashUser;
         }
 
-        public void reset()
+        /// <summary>
+        ///     Faz reset ao Url para este poder ser usado no pedido
+        /// </summary>
+        private void Reset()
         {
-            url = "https://localhost:44325";
+            _url = "https://localhost:44325";
         }
 
-
+        /// <summary>
+        ///     Pede a lista de todas as Despesas do Utilizador
+        /// </summary>
+        /// <returns>Lista de Despesas</returns>
         public List<Expense> GetExpenses()
         {
-            reset();
-            url += "/Expense/{hashUser}/GetAll";
-            url = url.Replace("{hashUser}", hashUser);
-
+            Reset();
+            _url += "/Expense/{hashUser}/GetAll";
+            _url = _url.Replace("{hashUser}", _hashUser);
             return JsonConvert.DeserializeObject<List<Expense>>(_get());
         }
 
+        /// <summary>
+        ///     Faz o pedido de eliminação de uma Despesa
+        /// </summary>
+        /// <param name="id">Id da Despesa a eliminar</param>
+        /// <returns>
+        ///     <para>TRUE: Despesa eliminada com sucesso</para>
+        ///     <para>FALSE: Despesa não eliminada com sucesso</para>
+        /// </returns>
         public bool DeleteExpense(int id)
         {
-            reset();
-            url += "/Expense/{hashUser}/Delete/{id}";
-            url = url.Replace("{hashUser}", hashUser);
-            url = url.Replace("{id}", id.ToString());
-
+            Reset();
+            _url += "/Expense/{hashUser}/Delete/{id}";
+            _url = _url.Replace("{hashUser}", _hashUser);
+            _url = _url.Replace("{id}", id.ToString());
             return _delete();
         }
 
+        /// <summary>
+        ///     Faz o pedido de verificação de existência de um Utilizador
+        /// </summary>
+        /// <returns>
+        ///     <para>TRUE: Utilizador existe</para>
+        ///     <para>FALSE: Utilizador não existe</para>
+        /// </returns>
         public bool HasUser()
         {
-            reset();
-            url += "/Expense/{hashUser}/HasUser";
-            url = url.Replace("{hashUser}", hashUser);
-
+            Reset();
+            _url += "/Expense/{hashUser}/HasUser";
+            _url = _url.Replace("{hashUser}", _hashUser);
             return JsonConvert.DeserializeObject<bool>(_get());
         }
 
-
+        /// <summary>
+        ///     Realiza pedidos GET e devolve o JSON que recebe
+        /// </summary>
+        /// <returns>JSON recebido</returns>
+        /// <exception cref="ApplicationException">Erro ao obter dados</exception>
         private string _get()
         {
             // Create request with Updated Url
-            request = WebRequest.Create(url) as HttpWebRequest;
+            _request = WebRequest.Create(_url) as HttpWebRequest;
             try
             {
-                using (var response = request?.GetResponse() as HttpWebResponse)
+                using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
                 {
-                    if (response?.StatusCode != HttpStatusCode.OK)
+                    // Se o StatusCode for positivo
+                    if (response?.StatusCode == HttpStatusCode.OK)
+                        return new StreamReader(response.GetResponseStream() ?? throw new InvalidOperationException())
+                            .ReadToEnd();
+
+                    if (response != null)
                     {
                         string message = $"HTTP ERROR CODE: {response.StatusCode}";
                         throw new ApplicationException(message);
                     }
-
-                    return new StreamReader(response?.GetResponseStream() ?? throw new InvalidOperationException())
-                        .ReadToEnd();
                 }
             }
             catch (WebException e)
@@ -81,22 +108,35 @@ namespace DespesasWPF
             return null;
         }
 
+        /// <summary>
+        ///     Realiza pedidos DELETE e devolve TRUE ou FALSE mediate o resultado
+        /// </summary>
+        /// <returns>
+        ///     <para>TRUE: Dados apagados com sucesso</para>
+        ///     <para>FALSE: Dados não apagados com sucesso</para>
+        /// </returns>
+        /// <exception cref="ApplicationException">Erro no pedido</exception>
         private bool _delete()
         {
             // Create request with Updated Url
-            request = WebRequest.Create(url) as HttpWebRequest;
-            request.Method = "DELETE";
+            _request = WebRequest.Create(_url) as HttpWebRequest;
+
+            // Se não existir request devolve falso
+            if (_request == null) return false;
+
+            _request.Method = "DELETE";
             try
             {
-                using (var response = request?.GetResponse() as HttpWebResponse)
+                using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
                 {
-                    if (response?.StatusCode != HttpStatusCode.OK)
+                    // Se o status code for positivo devolve true
+                    if (response?.StatusCode == HttpStatusCode.OK) return true;
+
+                    if (response != null)
                     {
                         string message = $"HTTP ERROR CODE: {response.StatusCode}";
                         throw new ApplicationException(message);
                     }
-
-                    return true;
                 }
             }
             catch (WebException e)
@@ -107,41 +147,42 @@ namespace DespesasWPF
             return false;
         }
 
-
         /// <summary>
-        /// Devolve o valor atual do dolar equivalente a um euro 
+        ///     Realiza o pedido a uma API externa e devolve o valor atual do dolar equivalente a um euro 
         /// </summary>
-        /// <returns></returns>
-        public decimal getUsdRatesToEuro()
+        /// <returns>Valor do Dolar relativo a 1 Euro</returns>
+        public decimal GetUsdRatesToEuro()
         {
-            url = "https://api.exchangeratesapi.io/latest?base=EUR";
-            request = WebRequest.Create(url) as HttpWebRequest;
-
+            _url = "https://api.exchangeratesapi.io/latest?base=EUR";
+            _request = WebRequest.Create(_url) as HttpWebRequest;
             return JObject.Parse(_get()).SelectToken("rates").Value<decimal>("USD");
         }
 
         /// <summary>
-        /// Devolve o valor atual do euro equivalente a um dolar 
+        ///     Realiza o pedido a uma API externa e devolve o valor atual do euro equivalente a um dolar 
         /// </summary>
-        /// <returns></returns>
-        public decimal getEuroRatesToUsd()
+        /// <returns>Valor do Euro relativo a 1 Dolar</returns>
+        public decimal GetEuroRatesToUsd()
         {
-            url = "https://api.exchangeratesapi.io/latest?base=USD";
-            request = WebRequest.Create(url) as HttpWebRequest;
-
+            _url = "https://api.exchangeratesapi.io/latest?base=USD";
+            _request = WebRequest.Create(_url) as HttpWebRequest;
             return JObject.Parse(_get()).SelectToken("rates").Value<decimal>("EUR");
         }
 
-
+        /// <summary>
+        ///     Realiza o pedido para obter o último Id associado a um Utilizador de uma tabela
+        /// </summary>
+        /// <param name="nomeTabela">Nome da tabela a obter o último Id</param>
+        /// <returns>Último Id</returns>
         public int GetLastIdFromTable(string nomeTabela)
         {
-            reset();
-            url += "/Expense/{hashUser}/GetLastId/{nomeTabela}";
-            url = url.Replace("{hashUser}", hashUser);
-            url = url.Replace("{nomeTabela}", nomeTabela);
+            Reset();
+            _url += "/Expense/{hashUser}/GetLastId/{nomeTabela}";
+            _url = _url.Replace("{hashUser}", _hashUser);
+            _url = _url.Replace("{nomeTabela}", nomeTabela);
 
             // Create request with Updated Url
-            request = WebRequest.Create(url) as HttpWebRequest;
+            _request = WebRequest.Create(_url) as HttpWebRequest;
 
             return JsonConvert.DeserializeObject<int>(_get());
         }
