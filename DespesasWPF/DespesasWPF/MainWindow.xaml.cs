@@ -10,19 +10,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Interop;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using DespesasLibrary;
 using DespesasWPF.ExpenseSOAP;
 using Microsoft.Identity.Client;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json.Linq;
-using Button = System.Windows.Controls.Button;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using MessageBox = System.Windows.MessageBox;
-using TextBox = System.Windows.Controls.TextBox;
 
 namespace DespesasWPF
 {
@@ -41,13 +36,10 @@ namespace DespesasWPF
 
         private User UtilizadorLigado { get; } = new User();
         private ObservableCollection<Expense> Despesas { get; set; }
+        private ExpenseSOAPClient SoapClient { get; set; }
+        private Api Api { get; set; }
         private decimal TotalEur { get; set; }
         private decimal TotalUsd { get; set; }
-
-        private ExpenseSOAPClient soapClient { get; set; }
-        private Api api { get; set; }
-
-
         private decimal EuroEDolar { get; set; } // Um euro são x dolares
         private decimal DolarEEuro { get; set; } // Um dolar são y euros
 
@@ -58,13 +50,13 @@ namespace DespesasWPF
         {
             InitializeComponent();
             Despesas = new ObservableCollection<Expense>();
-            soapClient = new ExpenseSOAPClient();
+            SoapClient = new ExpenseSOAPClient();
             TotalEur = 0;
             TotalUsd = 0;
         }
 
         /// <summary>
-        /// Inicia sessão de um Utilizador.
+        ///     Inicia sessão de um Utilizador.
         /// <para>Chama AcquireToken para obter o Token de inicio de sessão.</para>
         /// </summary>
         /// <param name="sender"></param>
@@ -108,21 +100,20 @@ namespace DespesasWPF
             string nomeTemp = await GetHttpContentWithToken(GraphApiEndpoint, authResult.AccessToken);
             string emailUtilizadorLigadoTemp = authResult.Account.Username;
 
-            UtilizadorLigado.EmailSha = Hash.getHashSha256(emailUtilizadorLigadoTemp);
-            api = new Api(UtilizadorLigado.EmailSha);
+            UtilizadorLigado.EmailSha = Hash.GetHashSha256(emailUtilizadorLigadoTemp);
+            Api = new Api(UtilizadorLigado.EmailSha);
 
             // Get rates
-            EuroEDolar = api.getUsdRatesToEuro();
-            DolarEEuro = api.getEuroRatesToUsd();
+            EuroEDolar = Api.getUsdRatesToEuro();
+            DolarEEuro = Api.getEuroRatesToUsd();
 
-            if (!api.HasUser())
+            if (!Api.HasUser())
             {
-                soapClient.AddUser(UtilizadorLigado.EmailSha, "EUR");
+                await SoapClient.AddUserAsync(UtilizadorLigado.EmailSha, "EUR");
             }
 
-            UtilizadorLigado.SetUser();
-
-            api.GetExpenses().ForEach(despesa => { Despesas.Add(despesa); });
+            UtilizadorLigado.GetUserFromDb();
+            Api.GetExpenses().ForEach(despesa => { Despesas.Add(despesa); });
 
             // Preenchimento de dados na MainWindow
             LabelUtilizadorLigado.Content = "";
@@ -239,11 +230,12 @@ namespace DespesasWPF
         {
             // Esta verificação é util no login porque na construção da janela ele dispara o evento da moeda padrão do utilizador
             if (UtilizadorLigado.MoedaPadrao == "EUR") return;
-            if (soapClient.UpdateUser(UtilizadorLigado.EmailSha, "EUR"))
-            {
-                UtilizadorLigado.MoedaPadrao = "EUR";
-                LabelTotal.Content = TotalEur + "€";
-            }
+
+            // Se não conseguiu atualizar o Utilizador sai
+            if (!SoapClient.UpdateUser(UtilizadorLigado.EmailSha, "EUR")) return;
+
+            UtilizadorLigado.MoedaPadrao = "EUR";
+            LabelTotal.Content = TotalEur + "€";
         }
 
         /// <summary>
@@ -256,11 +248,11 @@ namespace DespesasWPF
             // Esta verificação é util no login porque na construção da janela ele dispara o evento da moeda padrão do utilizador
             if (UtilizadorLigado.MoedaPadrao == "USD") return;
 
-            if (soapClient.UpdateUser(UtilizadorLigado.EmailSha, "USD"))
-            {
-                UtilizadorLigado.MoedaPadrao = "USD";
-                LabelTotal.Content = TotalUsd + "$";
-            }
+            // Se não conseguiu atualizar o Utilizador sai
+            if (!SoapClient.UpdateUser(UtilizadorLigado.EmailSha, "USD")) return;
+
+            UtilizadorLigado.MoedaPadrao = "USD";
+            LabelTotal.Content = TotalUsd + "$";
         }
 
         /// <summary>
@@ -301,15 +293,23 @@ namespace DespesasWPF
             // Verifica se o CommandParameter é uma Despesa e guarda-a
             if (!(button?.CommandParameter is Expense despesa)) return;
 
-            if (api.DeleteExpense(int.Parse(despesa.Id)))
+            if (Api.DeleteExpense(int.Parse(despesa.Id)))
             {
                 Despesas.Remove(despesa);
                 TotalEur -= despesa.ValEur;
                 TotalUsd -= despesa.ValUsd;
+                if (UtilizadorLigado.MoedaPadrao == "EUR")
+                {
+                    LabelTotal.Content = TotalEur + "€";
+                }
+                else
+                {
+                    LabelTotal.Content = TotalUsd + "$";
+                }
             }
             else
             {
-                MessageBox.Show("Occoreu um erro!");
+                MessageBox.Show("Occoreu um erro ao apagar Despesa!");
             }
         }
 
@@ -320,7 +320,7 @@ namespace DespesasWPF
         /// <param name="e"></param>
         private void ButtonCriarEditar_OnClick(object sender, RoutedEventArgs e)
         {
-            bool statusEditCreate = false;
+            bool statusCreateEdit = false;
 
             if (TextBoxNome.Text == "" || TextBoxDescricao.Text == "" || DatePickerData.Text == "" ||
                 TextBoxValorEur.Text == "" && TextBoxValorUsd.Text == "")
@@ -331,7 +331,9 @@ namespace DespesasWPF
             }
             else if (TextBoxId.Text == "")
             {
-                decimal valEur = 0, valUsd = 0;
+                // Se for para criar uma Despesa
+
+                decimal valEur, valUsd;
                 if (TextBoxValorEur.Text == "")
                 {
                     // Se o campo do Valor em € não estiver preenchido
@@ -351,16 +353,14 @@ namespace DespesasWPF
                     valUsd = decimal.Parse(TextBoxValorUsd.Text);
                 }
 
-                string dateValue = DatePickerData.Text + " " + DateTime.Now.ToString("HH:mm:ss");
-                statusEditCreate = soapClient.AddExpense(TextBoxNome.Text, TextBoxDescricao.Text,
-                    DateTime.Parse(dateValue), valEur, valUsd,
-                    UtilizadorLigado.EmailSha);
+                statusCreateEdit = SoapClient.AddExpense(TextBoxNome.Text, TextBoxDescricao.Text,
+                    DateTime.Parse(DatePickerData.Text), valEur, valUsd, UtilizadorLigado.EmailSha);
 
-                if (statusEditCreate)
+                if (statusCreateEdit)
                 {
-                    Despesas.Add(new Expense(api.GetLastIdFromTable("despesas").ToString(), TextBoxNome.Text,
-                        TextBoxDescricao.Text,
-                        DateTime.Parse(dateValue), valEur, valUsd, UtilizadorLigado.EmailSha));
+                    Despesas.Add(new Expense(Api.GetLastIdFromTable("despesas").ToString(), TextBoxNome.Text,
+                        TextBoxDescricao.Text, DateTime.Parse(DatePickerData.Text), valEur, valUsd,
+                        UtilizadorLigado.EmailSha));
                     TotalEur += valEur;
                     TotalUsd += valUsd;
                     if (UtilizadorLigado.MoedaPadrao == "EUR")
@@ -375,12 +375,14 @@ namespace DespesasWPF
             }
             else
             {
-                decimal valEur = 0, valUsd = 0;
+                // Se for para atualizar uma Despesa
+
+                decimal valEur, valUsd;
                 if (TextBoxValorEur.Text == "")
                 {
                     // Se o campo do Valor em € não estiver preenchido
                     valUsd = decimal.Parse(TextBoxValorUsd.Text);
-                    valEur = valUsd * DolarEEuro; 
+                    valEur = valUsd * DolarEEuro;
                 }
                 else if (TextBoxValorUsd.Text == "")
                 {
@@ -395,17 +397,11 @@ namespace DespesasWPF
                     valUsd = decimal.Parse(TextBoxValorUsd.Text);
                 }
 
-                MessageBox.Show("Editar Despesa na BD");
-                statusEditCreate = soapClient.UpdateExpense(TextBoxId.Text,
-                    TextBoxNome.Text,
-                    TextBoxDescricao.Text,
-                    DateTime.Parse(DatePickerData.Text),
-                    valEur,
-                    valUsd,
-                    UtilizadorLigado.EmailSha);
-                
+                statusCreateEdit = SoapClient.UpdateExpense(TextBoxId.Text, TextBoxNome.Text, TextBoxDescricao.Text,
+                    DateTime.Parse(DatePickerData.Text), valEur, valUsd, UtilizadorLigado.EmailSha);
+
                 Expense despesaEditar = Despesas.FirstOrDefault(d => d.Id == TextBoxId.Text);
-                if (despesaEditar != null && statusEditCreate)
+                if (despesaEditar != null && statusCreateEdit)
                 {
                     Despesas.Remove(despesaEditar);
                     TotalEur -= despesaEditar.ValEur;
@@ -424,16 +420,16 @@ namespace DespesasWPF
                     }
                 }
             }
-            
-            if (statusEditCreate)
-            {
-                TextBoxId.Text = "";
-                TextBoxNome.Text = "";
-                TextBoxDescricao.Text = "";
-                DatePickerData.Text = "";
-                TextBoxValorEur.Text = "";
-                TextBoxValorUsd.Text = "";
-            }
+
+            // Se não criou/editou com sucesso sai
+            if (!statusCreateEdit) return;
+
+            TextBoxId.Text = "";
+            TextBoxNome.Text = "";
+            TextBoxDescricao.Text = "";
+            DatePickerData.Text = "";
+            TextBoxValorEur.Text = "";
+            TextBoxValorUsd.Text = "";
         }
 
         /// <summary>

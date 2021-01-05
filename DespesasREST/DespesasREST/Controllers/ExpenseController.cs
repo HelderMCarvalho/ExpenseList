@@ -26,7 +26,7 @@ namespace DespesasREST.Controllers
             if (!dbConnect.HasUser(hashUser)) return new StatusCodeResult(401);
 
             const string query =
-                "SELECT id, nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser;";
+                "SELECT id, nome, descricao, dataHoraCriacao, valEur, valUsd, utilizador_id FROM despesas_isi.despesas WHERE utilizador_id = @hashUser;";
             List<MySqlParameter> parameters = new List<MySqlParameter>
             {
                 new("@hashUser", hashUser)
@@ -38,7 +38,8 @@ namespace DespesasREST.Controllers
                 {
                     while (reader.Read())
                     {
-                        res.Add(new Expense(reader.GetString(0),reader.GetString(1), reader.GetString(2), reader.GetDateTime(3),
+                        res.Add(new Expense(reader.GetString(0), reader.GetString(1), reader.GetString(2),
+                            reader.GetDateTime(3),
                             reader.GetDecimal(4), reader.GetDecimal(5), reader.GetString(6)));
                     }
                 }
@@ -71,7 +72,7 @@ namespace DespesasREST.Controllers
             if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
 
             // Check if User or Expense exist
-            if (!dbConnect.HasUser(hashUser) || !new Expense().HasExpense(id)) return new StatusCodeResult(401);
+            if (!dbConnect.HasUser(hashUser) || !Expense.HasExpense(id)) return new StatusCodeResult(401);
 
             const string query = "DELETE FROM despesas_isi.despesas WHERE (id = @id);";
             List<MySqlParameter> parameters = new List<MySqlParameter>
@@ -81,6 +82,14 @@ namespace DespesasREST.Controllers
             return dbConnect.ExecSqlWithStatus(query, parameters) ? Ok() : new StatusCodeResult(500);
         }
 
+        /// <summary>
+        ///     Verifies if the User exists
+        /// </summary>
+        /// <param name="hashUser">Hash os the User to look for</param>
+        /// <returns>
+        ///     <para>TRUE: The User exists</para>
+        ///     <para>FALSE: The User doesn't exist</para>
+        /// </returns>
         [HttpGet("[action]")]
         public ActionResult<bool> HasUser(string hashUser)
         {
@@ -91,7 +100,13 @@ namespace DespesasREST.Controllers
 
             return dbConnect.HasUser(hashUser);
         }
-        
+
+        /// <summary>
+        ///     Gets the last Id of a specific table but the Id is bound the a specific User
+        /// </summary>
+        /// <param name="nomeTabela">Name of the table to get the last Id</param>
+        /// <param name="hashUser">Hash of the user</param>
+        /// <returns>The last Id of that table bound to that User</returns>
         [HttpGet("[action]/{nomeTabela}")]
         public ActionResult<int> GetLastId(string nomeTabela, string hashUser)
         {
@@ -102,6 +117,5 @@ namespace DespesasREST.Controllers
 
             return dbConnect.GetLastId(nomeTabela, hashUser);
         }
-        
     }
 }

@@ -51,14 +51,14 @@ namespace DespesasLibrary
         ///     <para>TRUE: Expense exists</para>
         ///     <para>FALSE: Expense does not exist</para>
         /// </returns>
-        public bool HasExpense(string id)
+        public static bool HasExpense(string id)
         {
             DbConnect db = new DbConnect();
 
             // Check if connection is opened
             if (!db.IsConnectionOpen()) return false;
 
-            const string query = "SELECT id FROM despesas_isi.despesas where despesas_isi.despesas.id = @id;";
+            const string query = "SELECT id FROM despesas_isi.despesas WHERE id = @id;";
             List<MySqlParameter> parameters = new List<MySqlParameter> {new MySqlParameter("@id", id)};
             MySqlDataReader reader = db.ExecSqlWithData(query, parameters);
             try

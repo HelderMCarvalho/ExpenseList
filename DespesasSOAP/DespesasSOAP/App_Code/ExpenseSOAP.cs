@@ -72,8 +72,4 @@ public class ExpenseSOAP : IExpenseSOAP
         DbConnect db = new DbConnect();
         return db.RunOperation(op, new User(emailSha, moedaPadrao));
     }
-
-
-
-
 }

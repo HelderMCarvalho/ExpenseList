@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using MySql.Data.MySqlClient;
 
 namespace DespesasLibrary
@@ -18,10 +17,31 @@ namespace DespesasLibrary
         /// </summary>
         private void Init()
         {
-            Server = "localhost";
-            DatabaseName = "despesas_isi";
-            UserName = "root";
-            Password = "";
+            const bool isLocal = false;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+            if (isLocal)
+                // ReSharper disable once HeuristicUnreachableCode
+#pragma warning disable 162
+            {
+                // ReSharper disable once HeuristicUnreachableCode
+                Server = "localhost";
+                DatabaseName = "despesas_isi";
+                UserName = "root";
+                Password = "";
+            }
+#pragma warning restore 162
+            // ReSharper disable once RedundantIfElseBlock
+            else
+                // ReSharper disable once HeuristicUnreachableCode
+#pragma warning disable 162
+            {
+                // ReSharper disable once HeuristicUnreachableCode
+                Server = "despesas-isi-mysql.mysql.database.azure.com";
+                DatabaseName = "despesas_isi";
+                UserName = "despesasisimysql@despesas-isi-mysql";
+                Password = "despes@s-1s1-BD";
+            }
+#pragma warning restore 162
         }
 
         /// <summary>
@@ -35,9 +55,7 @@ namespace DespesasLibrary
         /// <summary>
         ///     Check if the connection to the DB is open, if not it ill be opened
         /// </summary>
-        /// <returns>
-        ///     TRUE: Connection is open
-        /// </returns>
+        /// <returns>TRUE: Connection is open</returns>
         public bool IsConnectionOpen()
         {
             Init();
@@ -59,7 +77,7 @@ namespace DespesasLibrary
         public bool HasUser(string hashUser)
         {
             const string query =
-                "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
+                "SELECT emailSha FROM despesas_isi.utilizadores WHERE emailSha = @hashUser;";
             List<MySqlParameter> parameters = new List<MySqlParameter>
             {
                 new MySqlParameter("@hashUser", hashUser)
@@ -116,7 +134,7 @@ namespace DespesasLibrary
             try
             {
                 MySqlCommand cmd = new MySqlCommand(query, Connection);
-                parameters.ForEach(paramn => { cmd.Parameters.Add(paramn); });
+                parameters.ForEach(param => { cmd.Parameters.Add(param); });
                 MySqlDataReader reader = cmd.ExecuteReader();
                 reader.Close();
                 return true;
@@ -138,7 +156,7 @@ namespace DespesasLibrary
             try
             {
                 MySqlCommand cmd = new MySqlCommand(query, Connection);
-                parameters.ForEach(paramn => { cmd.Parameters.Add(paramn); });
+                parameters.ForEach(param => { cmd.Parameters.Add(param); });
                 return cmd.ExecuteReader();
             }
             catch (Exception)
@@ -152,7 +170,7 @@ namespace DespesasLibrary
         /// </summary>
         /// <param name="op">Operation to execute</param>
         /// <param name="data">Data to add to the SQL query</param>
-        /// <param name="id">ID of the Expense to be updated (only used on update)</param>  TODO: MUDAR PARA INT????
+        /// <param name="id">ID of the Expense to be updated (only used on update)</param>
         /// <returns>
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
@@ -163,7 +181,7 @@ namespace DespesasLibrary
              Test if:
                 Connection with DB is open,
                 User Exist,
-                Expense ID Exist,   TODO: NÃO ESTÁ A VERIFICAR ISTO
+                Expense ID Exist,
                 Data is filled;
             */
 
@@ -182,10 +200,10 @@ namespace DespesasLibrary
                         break;
                     case 2: // Update
                         // Can this user update this Expense?
-                        if (id != "" && data.CanUpdate(id, data.HashUser) && data.HasExpense(id))
+                        if (id != "" && data.CanUpdate(id, data.HashUser) && Expense.HasExpense(id))
                         {
-                            query = "UPDATE despesas_isi.despesas " +
-                                    "SET nome = @nome, descricao = @desc,dataHoraCriacao = @dataHoraCriacao, valEur = @valEuro, valUsd = @valUsd WHERE(id = @id);";
+                            query =
+                                "UPDATE despesas_isi.despesas SET nome = @nome, descricao = @desc,dataHoraCriacao = @dataHoraCriacao, valEur = @valEuro, valUsd = @valUsd WHERE(id = @id);";
                             parameters.Add(new MySqlParameter("?id", id));
                         }
                         else
@@ -217,7 +235,6 @@ namespace DespesasLibrary
         /// </summary>
         /// <param name="op">Operation to execute</param>
         /// <param name="data">Data to add to the SQL query</param>
-        /// <param name="id">ID of the User to be updated (only used on update)</param>
         /// <returns>
         ///     <para>TRUE: Operation executed successfully</para>
         ///     <para>FALSE: Operation not executed successfully</para>
@@ -227,8 +244,8 @@ namespace DespesasLibrary
             /*
              Test if:
                 Connection with DB is open,
-                User Exists     TODO: NÃO ESTÁ A VERIFICAR ISTO
-                Expense Exists      TODO: NÃO ESTÁ A VERIFICAR ISTO
+                User Exists
+                Expense Exists
                 Data is filled;
             */
 
@@ -272,9 +289,15 @@ namespace DespesasLibrary
             return false;
         }
 
+        /// <summary>
+        ///     Obtém o Id do último registo inserido por um determinado Utilizador numa tabela
+        /// </summary>
+        /// <param name="nomeTabela">Nome da tabela a obter o Id do último registo</param>
+        /// <param name="hashUser">Hash do Utilizador</param>
+        /// <returns>Último Id registado na tabela e associado ao respetivo Utilizador</returns>
         public int GetLastId(string nomeTabela, string hashUser)
         {
-            string query = "SELECT MAX(id) FROM " + nomeTabela + " where utilizador_id = @hashUser";
+            string query = "SELECT MAX(id) FROM despesas_isi." + nomeTabela + " WHERE utilizador_id = @hashUser";
             List<MySqlParameter> parameters = new List<MySqlParameter>
             {
                 new MySqlParameter("@hashUser", hashUser)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 
 namespace DespesasLibrary
@@ -27,26 +26,30 @@ namespace DespesasLibrary
             MoedaPadrao = moedaPadrao;
         }
 
-
-        public void SetUser()
+        /// <summary>
+        ///     Obtém a informação do Utilizador, se este existir
+        /// </summary>
+        public void GetUserFromDb()
         {
             DbConnect dbConnect = new DbConnect();
-            if (dbConnect.IsConnectionOpen())
+
+            // Se a conexão não está aberta sai
+            if (!dbConnect.IsConnectionOpen()) return;
+
+            const string query =
+                "SELECT emailSha, moedaPadrao FROM despesas_isi.utilizadores WHERE emailSha = @hashUser;";
+            List<MySqlParameter> parameters = new List<MySqlParameter>
             {
-                const string query =
-                    "SELECT emailSha, moedaPadrao FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
-                List<MySqlParameter> parameters = new List<MySqlParameter>
-                {
-                    new MySqlParameter("@hashUser", EmailSha)
-                };
-                MySqlDataReader reader = dbConnect.ExecSqlWithData(query, parameters);
-                if (reader != null && reader.HasRows && reader.Read())
-                {
-                    EmailSha = reader.GetString(0);
-                    MoedaPadrao = reader.GetString(1);
-                    reader.Close();
-                }
-            }
+                new MySqlParameter("@hashUser", EmailSha)
+            };
+            MySqlDataReader reader = dbConnect.ExecSqlWithData(query, parameters);
+
+            // Se não receber dados sai
+            if (reader == null || !reader.HasRows || !reader.Read()) return;
+
+            EmailSha = reader.GetString(0);
+            MoedaPadrao = reader.GetString(1);
+            reader.Close();
         }
     }
 }

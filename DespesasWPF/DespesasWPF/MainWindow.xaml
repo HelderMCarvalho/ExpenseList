@@ -18,12 +18,16 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <Label>Moeda padrão:</Label>
-                    <RadioButton Name="RadioButtonEur" VerticalAlignment="Center" Margin="0,0,10,0" Checked="RadioButtonEur_OnChecked">EUR</RadioButton>
+                    <RadioButton Name="RadioButtonEur" VerticalAlignment="Center" Margin="0,0,10,0"
+                                 Checked="RadioButtonEur_OnChecked">
+                        EUR
+                    </RadioButton>
                     <RadioButton Name="RadioButtonUsd" VerticalAlignment="Center" Checked="RadioButtonUsd_OnChecked">USD</RadioButton>
                     <Label Name="LabelUtilizadorLigado" VerticalAlignment="Center" FontWeight="Bold"
-                               Margin="10,0,0,0" />
+                           Margin="10,0,0,0" />
                 </StackPanel>
-                <Button Grid.Column="1" Content="🚪" Name="ButtonSair" Click="ButtonSair_Click" ToolTip="Sair" FontSize="15"
+                <Button Grid.Column="1" Content="🚪" Click="ButtonSair_Click" ToolTip="Sair"
+                        FontSize="15"
                         Margin="10,0,0,0" Background="Transparent" BorderThickness="0" />
             </Grid>
             <Grid DockPanel.Dock="Top">
@@ -86,20 +90,21 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
-                <TextBox Name="TextBoxId" Visibility="Collapsed"></TextBox>
-                <TextBox Grid.Column="0" Grid.ColumnSpan="4" Name="TextBoxNome" Margin="0,0,5,0"></TextBox>
-                <TextBox Grid.Column="4" Grid.ColumnSpan="12" Name="TextBoxDescricao" Margin="0,0,50,0"></TextBox>
-                <DatePicker Grid.Column="16" Grid.ColumnSpan="3" Name="DatePickerData" Margin="-45,0,5,0"></DatePicker>
-                <TextBox Grid.Column="19" Name="TextBoxValorEur" KeyUp="TextBoxValor_OnKeyUp" Margin="0,0,-15,0"></TextBox>
-                <TextBox Grid.Column="21" Name="TextBoxValorUsd" KeyUp="TextBoxValor_OnKeyUp" Margin="-30,0,20,0"></TextBox>
-                <Button Grid.Column="22" Content="Criar/Editar" Name="ButtonCriarEditar" Click="ButtonCriarEditar_OnClick" ToolTip="Criar/Editar Despesa" Margin="-15,0,0,0"></Button>
-                <Button Grid.Column="23" Content="❌" Name="ButtonCancelar" Click="ButtonCancelar_OnClick" ToolTip="Cancelar Criar/Editar Despesa" Margin="10,0,0,0"></Button>
+                <TextBox Grid.Column="0" Name="TextBoxId" Visibility="Collapsed" />
+                <TextBox Grid.Column="0" Grid.ColumnSpan="4" Name="TextBoxNome" Margin="0,0,5,0" />
+                <TextBox Grid.Column="4" Grid.ColumnSpan="12" Name="TextBoxDescricao" Margin="0,0,50,0" />
+                <DatePicker Grid.Column="16" Grid.ColumnSpan="3" Name="DatePickerData" Margin="-45,0,5,0" />
+                <TextBox Grid.Column="19" Name="TextBoxValorEur" KeyUp="TextBoxValor_OnKeyUp" Margin="0,0,-15,0" />
+                <TextBox Grid.Column="21" Name="TextBoxValorUsd" KeyUp="TextBoxValor_OnKeyUp" Margin="-30,0,20,0" />
+                <Button Grid.Column="22" Content="Criar/Editar"
+                        Click="ButtonCriarEditar_OnClick" ToolTip="Criar/Editar Despesa" Margin="-15,0,0,0" />
+                <Button Grid.Column="23" Content="❌" Click="ButtonCancelar_OnClick"
+                        ToolTip="Cancelar Criar/Editar Despesa" Margin="10,0,0,0" />
             </Grid>
             <Grid DockPanel.Dock="Bottom" VerticalAlignment="Center" HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal">
                     <Label FontWeight="Bold">Total:</Label>
-                    <Label Name="LabelTotal"></Label>
+                    <Label Name="LabelTotal" />
                 </StackPanel>
             </Grid>
             <ListView Name="DespesasTable" d:DataContext="{d:DesignInstance}" Margin="0,10,0,10">
@@ -115,7 +120,8 @@
                                 <GridViewColumnHeader Tag="Descricao" Click="DespesasTableColumnHeader_Click">Descrição</GridViewColumnHeader>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="200" DisplayMemberBinding="{Binding DataHoraCriacao, StringFormat='dd/MM/yyyy'}">
+                        <GridViewColumn Width="200"
+                                        DisplayMemberBinding="{Binding DataHoraCriacao, StringFormat='dd/MM/yyyy'}">
                             <GridViewColumn.Header>
                                 <GridViewColumnHeader Tag="Data" Click="DespesasTableColumnHeader_Click">Data</GridViewColumnHeader>
                             </GridViewColumn.Header>
@@ -136,7 +142,8 @@
                             </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Name="ButtonEditarDespesa" Content="Editar" Click="ButtonEditarDespesa_OnClick" CommandParameter="{Binding}"></Button>
+                                    <Button Name="ButtonEditarDespesa" Content="Editar"
+                                            Click="ButtonEditarDespesa_OnClick" CommandParameter="{Binding}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -146,7 +153,8 @@
                             </GridViewColumn.Header>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Name="ButtonApagarDespesa" Content="Apagar" Click="ButtonApagarDespesa_OnClick" CommandParameter="{Binding}"></Button>
+                                    <Button Name="ButtonApagarDespesa" Content="Apagar"
+                                            Click="ButtonApagarDespesa_OnClick" CommandParameter="{Binding}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

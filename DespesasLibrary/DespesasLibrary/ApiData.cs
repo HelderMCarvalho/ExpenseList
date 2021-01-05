@@ -28,7 +28,7 @@ namespace DespesasLibrary
 
         /// <summary>
         ///     Check if a User can update an Expense
-        ///     If the User is the owner of the Expense he can update it
+        ///     <para>If the User is the owner of the Expense he can update it</para>
         /// </summary>
         /// <param name="despesaId">Expense ID to be checked</param>
         /// <param name="hashUser">User Hash to be checked</param>
@@ -47,14 +47,12 @@ namespace DespesasLibrary
             string query;
             if (GetType() == typeof(Expense))
             {
-                query =
-                    "SELECT id FROM despesas_isi.despesas WHERE despesas_isi.despesas.utilizador_id = @hashUser AND despesas_isi.despesas.id = @id;";
+                query = "SELECT id FROM despesas_isi.despesas WHERE utilizador_id = @hashUser AND id = @id;";
                 parameters.Add(new MySqlParameter("@id", despesaId));
             }
             else
             {
-                query =
-                    "SELECT emailSha FROM despesas_isi.utilizadores WHERE despesas_isi.utilizadores.emailSha = @hashUser;";
+                query = "SELECT emailSha FROM despesas_isi.utilizadores WHERE emailSha = @hashUser;";
             }
 
             parameters.Add(new MySqlParameter("@hashUser", hashUser));
