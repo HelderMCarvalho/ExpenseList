@@ -28,7 +28,9 @@ namespace DespesasWPF
         /// </summary>
         private void Reset()
         {
-            _url = "https://localhost:44325";
+            const bool isLocal = false;
+            // ReSharper disable once UnreachableCode
+            _url = isLocal ? "https://localhost:44325" : "https://despesasrest.azurewebsites.net/";
         }
 
         /// <summary>
