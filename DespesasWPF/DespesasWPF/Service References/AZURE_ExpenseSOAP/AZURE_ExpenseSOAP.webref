@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="http://despesassoap.azurewebsites.net/Service.svc?wsdl" filename="ExpenseSOAP.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.DiscoveryDocumentReference" url="http://despesassoap.azurewebsites.net/Service.svc?disco" filename="Service.disco" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="http://despesassoap.azurewebsites.net/Service.svc?xsd=xsd0" filename="Service.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="http://despesassoap.azurewebsites.net/Service.svc?xsd=xsd1" filename="Service0.xsd" />
+  </Results>
+</DiscoveryClientResultsFile>

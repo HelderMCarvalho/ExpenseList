@@ -59,6 +59,11 @@
             <SubType>Designer</SubType>
         </ApplicationDefinition>
         <Compile Include="Api.cs" />
+        <Compile Include="Service References\AZURE_ExpenseSOAP\AZURE_ExpenseSOAP.cs">
+          <AutoGen>True</AutoGen>
+          <DesignTime>True</DesignTime>
+          <DependentUpon>AZURE_ExpenseSOAP.svcmap</DependentUpon>
+        </Compile>
         <Compile Include="Service References\ExpenseSOAP\ExpenseSOAP.cs">
           <AutoGen>True</AutoGen>
           <DesignTime>True</DesignTime>
@@ -95,6 +100,15 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="App.config" />
+        <None Include="Service References\AZURE_ExpenseSOAP\AZURE_ExpenseSOAP.svcmap">
+          <Generator>WCF Proxy Generator</Generator>
+          <LastGenOutput>AZURE_ExpenseSOAP.cs</LastGenOutput>
+        </None>
+        <None Include="Service References\AZURE_ExpenseSOAP\AZURE_ExpenseSOAP.webref" />
+        <None Include="Service References\AZURE_ExpenseSOAP\ExpenseSOAP.wsdl" />
+        <None Include="Service References\AZURE_ExpenseSOAP\Service.disco" />
+        <None Include="Service References\AZURE_ExpenseSOAP\Service.xsd" />
+        <None Include="Service References\AZURE_ExpenseSOAP\Service0.xsd" />
         <None Include="Service References\ExpenseSOAP\ExpenseSOAP.svcmap">
           <Generator>WCF Proxy Generator</Generator>
           <LastGenOutput>ExpenseSOAP.cs</LastGenOutput>
@@ -124,6 +138,7 @@
       <WCFMetadata Include="Service References" />
     </ItemGroup>
     <ItemGroup>
+      <WCFMetadataStorage Include="Service References\AZURE_ExpenseSOAP" />
       <WCFMetadataStorage Include="Service References\ExpenseSOAP" />
     </ItemGroup>
     <ItemGroup>

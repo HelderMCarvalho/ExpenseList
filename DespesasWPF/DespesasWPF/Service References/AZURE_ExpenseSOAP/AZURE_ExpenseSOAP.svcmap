@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="1eb77a1e-cf18-4ba3-a00e-f026ad0c9c8e" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://despesassoap.azurewebsites.net/Service.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="ExpenseSOAP.wsdl" MetadataType="Wsdl" ID="d4fa9316-bf73-4c08-8860-c5b93d1174ae" SourceId="1" SourceUrl="http://despesassoap.azurewebsites.net/Service.svc?wsdl" />
+    <MetadataFile FileName="Service.disco" MetadataType="Disco" ID="11cccb78-0f4f-4aec-acae-ba93c922f14b" SourceId="1" SourceUrl="http://despesassoap.azurewebsites.net/Service.svc?disco" />
+    <MetadataFile FileName="Service.xsd" MetadataType="Schema" ID="d932b0db-3127-4c42-9637-69daaa128619" SourceId="1" SourceUrl="http://despesassoap.azurewebsites.net/Service.svc?xsd=xsd0" />
+    <MetadataFile FileName="Service0.xsd" MetadataType="Schema" ID="d2a5525b-13bf-4a0b-90d2-173b244668c3" SourceId="1" SourceUrl="http://despesassoap.azurewebsites.net/Service.svc?xsd=xsd1" />
+  </Metadata>
+  <Extensions />
+</ReferenceGroup>

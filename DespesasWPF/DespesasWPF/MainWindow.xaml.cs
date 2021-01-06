@@ -15,7 +15,8 @@ using System.Windows.Interop;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using DespesasLibrary;
-using DespesasWPF.ExpenseSOAP;
+// using DespesasWPF.ExpenseSOAP;           // SOAP local
+using DespesasWPF.AZURE_ExpenseSOAP;        // SOAP online
 using Microsoft.Identity.Client;
 using Newtonsoft.Json.Linq;
 
@@ -50,7 +51,12 @@ namespace DespesasWPF
         {
             InitializeComponent();
             Despesas = new ObservableCollection<Expense>();
+            
+            // Trocar "usings" para Utilizar SOAP:
+            //      Local: "using DespesasWPF.ExpenseSOAP;"
+            //      Online: "using DespesasWPF.AZURE_ExpenseSOAP;"
             SoapClient = new ExpenseSOAPClient();
+            
             TotalEur = 0;
             TotalUsd = 0;
         }
