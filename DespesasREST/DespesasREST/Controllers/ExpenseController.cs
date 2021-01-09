@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DespesasLibrary;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
@@ -8,6 +9,7 @@ namespace DespesasREST.Controllers
 {
     [Route("[controller]/{hashUser}")]
     [ApiController]
+    [Authorize]
     public class ExpenseController : ControllerBase
     {
         /// <summary>
@@ -94,10 +96,8 @@ namespace DespesasREST.Controllers
         public ActionResult<bool> HasUser(string hashUser)
         {
             DbConnect dbConnect = new DbConnect();
-
             // Check if connection is opened
             if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
-
             return dbConnect.HasUser(hashUser);
         }
 

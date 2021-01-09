@@ -93,6 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiData.cs" />
+    <Compile Include="AuthenticateRequest.cs" />
+    <Compile Include="AuthenticateResponse.cs" />
     <Compile Include="DbConnect.cs" />
     <Compile Include="Expense.cs" />
     <Compile Include="Hash.cs" />

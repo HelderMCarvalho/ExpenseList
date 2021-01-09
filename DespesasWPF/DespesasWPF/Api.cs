@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 using DespesasLibrary;
+using DespesasREST.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,6 +15,7 @@ namespace DespesasWPF
         private HttpWebRequest _request;
         private string _url;
         private readonly string _hashUser;
+        private string _token;
 
         /// <summary>
         ///     Construtor
@@ -21,6 +24,7 @@ namespace DespesasWPF
         public Api(string hashUser)
         {
             _hashUser = hashUser;
+            _token = getToken();
         }
 
         /// <summary>
@@ -28,7 +32,7 @@ namespace DespesasWPF
         /// </summary>
         private void Reset()
         {
-            const bool isLocal = false;
+            const bool isLocal = true;
             // ReSharper disable once UnreachableCode
             _url = isLocal ? "https://localhost:44325" : "https://despesasrest.azurewebsites.net/";
         }
@@ -86,6 +90,7 @@ namespace DespesasWPF
         {
             // Create request with Updated Url
             _request = WebRequest.Create(_url) as HttpWebRequest;
+            _request.Headers.Add("Authorization", "Bearer " + _token);
             try
             {
                 using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
@@ -122,6 +127,7 @@ namespace DespesasWPF
         {
             // Create request with Updated Url
             _request = WebRequest.Create(_url) as HttpWebRequest;
+            _request.Headers.Add("Authorization", "Bearer " + _token);
 
             // Se não existir request devolve falso
             if (_request == null) return false;
@@ -187,6 +193,46 @@ namespace DespesasWPF
             _request = WebRequest.Create(_url) as HttpWebRequest;
 
             return JsonConvert.DeserializeObject<int>(_get());
+        }
+
+
+        private string getToken()
+        {
+            Reset();
+
+            AuthenticateResponse res = null;
+
+            var json = JsonConvert.SerializeObject(new AuthenticateRequest(_hashUser), Formatting.Indented);
+            _url += "/Security/login";
+            _request = WebRequest.Create(_url) as HttpWebRequest;
+            _request.Method = "POST";
+            _request.ContentType = "application/json";
+            _request.ContentLength = json.Length;
+
+            // Preencher o corpo do pedido
+            using (var dataStream = _request.GetRequestStream())
+            {
+                dataStream.Write(Encoding.UTF8.GetBytes(json), 0, json.Length);
+            }
+
+            using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
+            {
+                // Se o status code for positivo devolve true
+                if (response?.StatusCode == HttpStatusCode.OK)
+                {
+                    return JsonConvert.DeserializeObject<AuthenticateResponse>(
+                        new StreamReader(response.GetResponseStream() ?? throw new InvalidOperationException())
+                            .ReadToEnd()).Token;
+                }
+
+                if (response != null)
+                {
+                    string message = $"HTTP ERROR CODE: {response.StatusCode}";
+                    throw new ApplicationException(message);
+                }
+            }
+
+            return res.Token;
         }
     }
 }
