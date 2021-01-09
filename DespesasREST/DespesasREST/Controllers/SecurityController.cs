@@ -1,10 +1,4 @@
-﻿/*
- * lufer
- * ISI
- * */
-
-using DespesasLibrary;
-using DespesasREST.Models;
+﻿using DespesasLibrary;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,27 +8,28 @@ namespace DespesasREST.Controllers
     [ApiController]
     public class SecurityController : ControllerBase
     {
-        //classe que gera o JWT
         private readonly IJwtAuthenticationManager _jWtAuthenticationManager;
 
+        /// <summary>
+        ///     Construtor
+        /// </summary>
+        /// <param name="jWtAuthenticationManager">Gestor de autenticação</param>
         public SecurityController(IJwtAuthenticationManager jWtAuthenticationManager)
         {
             _jWtAuthenticationManager = jWtAuthenticationManager;
-
         }
 
         /// <summary>
-        /// Método para Autenticação
+        ///     Método de Autenticação
         /// </summary>
-        /// <param name="loginDetalhes"></param>
+        /// <param name="authenticationDetails">Detalhes da autenticação</param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("login")]
-        public ActionResult<AuthenticateResponse> Login(AuthenticateRequest loginDetalhes) //or ([FromBody] AuthenticateRequest loginDetalhes)
+        public ActionResult<AuthenticateResponse> Login(AuthenticateRequest authenticationDetails)
         {
-            var token = _jWtAuthenticationManager.Authenticate(loginDetalhes);           
-            if (token == null)
-                return Unauthorized();
+            AuthenticateResponse token = _jWtAuthenticationManager.Authenticate(authenticationDetails);
+            if (token == null) return Unauthorized();
             return Ok(token);
         }
     }

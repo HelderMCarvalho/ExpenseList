@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Text;
 using DespesasLibrary;
-using DespesasREST.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,7 +14,7 @@ namespace DespesasWPF
         private HttpWebRequest _request;
         private string _url;
         private readonly string _hashUser;
-        private string _token;
+        private readonly string _token;
 
         /// <summary>
         ///     Construtor
@@ -24,7 +23,7 @@ namespace DespesasWPF
         public Api(string hashUser)
         {
             _hashUser = hashUser;
-            _token = getToken();
+            _token = GetToken();
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace DespesasWPF
         /// </summary>
         private void Reset()
         {
-            const bool isLocal = true;
+            const bool isLocal = false;
             // ReSharper disable once UnreachableCode
             _url = isLocal ? "https://localhost:44325" : "https://despesasrest.azurewebsites.net/";
         }
@@ -90,7 +89,7 @@ namespace DespesasWPF
         {
             // Create request with Updated Url
             _request = WebRequest.Create(_url) as HttpWebRequest;
-            _request.Headers.Add("Authorization", "Bearer " + _token);
+            _request?.Headers.Add("Authorization", "Bearer " + _token);
             try
             {
                 using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
@@ -127,7 +126,7 @@ namespace DespesasWPF
         {
             // Create request with Updated Url
             _request = WebRequest.Create(_url) as HttpWebRequest;
-            _request.Headers.Add("Authorization", "Bearer " + _token);
+            _request?.Headers.Add("Authorization", "Bearer " + _token);
 
             // Se não existir request devolve falso
             if (_request == null) return false;
@@ -196,21 +195,28 @@ namespace DespesasWPF
         }
 
 
-        private string getToken()
+        /// <summary>
+        ///     Faz o pedido para obter o Token
+        /// </summary>
+        /// <returns>Token</returns>
+        /// <exception cref="ApplicationException"></exception>
+        private string GetToken()
         {
             Reset();
 
-            AuthenticateResponse res = null;
-
-            var json = JsonConvert.SerializeObject(new AuthenticateRequest(_hashUser), Formatting.Indented);
+            string json = JsonConvert.SerializeObject(new AuthenticateRequest(_hashUser), Formatting.Indented);
             _url += "/Security/login";
             _request = WebRequest.Create(_url) as HttpWebRequest;
+
+            // Se não existir Request
+            if (_request == null) return null;
+
             _request.Method = "POST";
             _request.ContentType = "application/json";
             _request.ContentLength = json.Length;
 
             // Preencher o corpo do pedido
-            using (var dataStream = _request.GetRequestStream())
+            using (Stream dataStream = _request.GetRequestStream())
             {
                 dataStream.Write(Encoding.UTF8.GetBytes(json), 0, json.Length);
             }
@@ -225,14 +231,12 @@ namespace DespesasWPF
                             .ReadToEnd()).Token;
                 }
 
-                if (response != null)
-                {
-                    string message = $"HTTP ERROR CODE: {response.StatusCode}";
-                    throw new ApplicationException(message);
-                }
-            }
+                // Se não existir Response
+                if (response == null) return null;
 
-            return res.Token;
+                string message = $"HTTP ERROR CODE: {response.StatusCode}";
+                throw new ApplicationException(message);
+            }
         }
     }
 }

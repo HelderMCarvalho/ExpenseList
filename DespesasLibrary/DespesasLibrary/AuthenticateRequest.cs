@@ -8,11 +8,7 @@ namespace DespesasLibrary
         {
             HashUser = hashUser;
         }
-        public AuthenticateRequest()
-        {
-        }
 
-        [Required]
-        public string HashUser { get; set; }
+        [Required] public string HashUser { get; set; }
     }
 }

@@ -1,16 +1,22 @@
 using System;
-using DespesasLibrary;
 
-namespace DespesasREST.Models
+namespace DespesasLibrary
 {
     public class AuthenticateResponse
     {
         public string HashUser { get; set; }
         public string Token { get; set; }
-
         public DateTime Expiration { get; set; }
 
-        public AuthenticateResponse() { }
+        public AuthenticateResponse()
+        {
+        }
+
+        /// <summary>
+        ///     Cria uma AuthenticateResponse
+        /// </summary>
+        /// <param name="user">Hash do Utilizador</param>
+        /// <param name="token">Token de segurança</param>
         public AuthenticateResponse(string user, string token)
         {
             HashUser = user;
@@ -18,6 +24,12 @@ namespace DespesasREST.Models
             Expiration = DateTime.Now.AddMinutes(120);
         }
 
+        /// <summary>
+        ///     Cria uma AuthenticateResponse
+        /// </summary>
+        /// <param name="user">Hash do Utilizador</param>
+        /// <param name="token">Token de segurança</param>
+        /// <param name="expires">Data de expiração do token</param>
         public AuthenticateResponse(AuthenticateRequest user, string token, DateTime expires)
         {
             HashUser = user.HashUser;

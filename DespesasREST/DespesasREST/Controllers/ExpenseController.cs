@@ -96,8 +96,10 @@ namespace DespesasREST.Controllers
         public ActionResult<bool> HasUser(string hashUser)
         {
             DbConnect dbConnect = new DbConnect();
+
             // Check if connection is opened
             if (!dbConnect.IsConnectionOpen()) return new StatusCodeResult(500);
+
             return dbConnect.HasUser(hashUser);
         }
 
