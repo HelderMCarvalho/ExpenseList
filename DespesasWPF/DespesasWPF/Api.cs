@@ -31,7 +31,7 @@ namespace DespesasWPF
         /// </summary>
         private void Reset()
         {
-            const bool isLocal = false;
+            const bool isLocal = true;
             // ReSharper disable once UnreachableCode
             _url = isLocal ? "https://localhost:44325" : "https://despesasrest.azurewebsites.net/";
         }
@@ -223,7 +223,7 @@ namespace DespesasWPF
 
             using (HttpWebResponse response = _request?.GetResponse() as HttpWebResponse)
             {
-                // Se o status code for positivo devolve true
+                // Se o status code for positivo
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     return JsonConvert.DeserializeObject<AuthenticateResponse>(

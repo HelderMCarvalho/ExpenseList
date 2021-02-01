@@ -15,8 +15,8 @@ using System.Windows.Interop;
 using Windows.Web.Http;
 using Windows.Web.Http.Headers;
 using DespesasLibrary;
-// using DespesasWPF.ExpenseSOAP;           // SOAP local
-using DespesasWPF.AZURE_ExpenseSOAP;        // SOAP online
+using DespesasWPF.ExpenseSOAP;           // SOAP local
+// using DespesasWPF.AZURE_ExpenseSOAP;        // SOAP online
 using Microsoft.Identity.Client;
 using Newtonsoft.Json.Linq;
 

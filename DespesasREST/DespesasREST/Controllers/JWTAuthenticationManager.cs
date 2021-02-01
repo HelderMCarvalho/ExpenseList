@@ -25,7 +25,7 @@ namespace DespesasREST.Controllers
         private readonly string _tokenKey;
 
         /// <summary>
-        /// Gere Token
+        ///     Gere Token
         /// </summary>
         /// <param name="tokenKey"></param>
         public JwtAuthenticationManager(string tokenKey)

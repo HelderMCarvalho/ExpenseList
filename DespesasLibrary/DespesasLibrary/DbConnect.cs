@@ -17,7 +17,7 @@ namespace DespesasLibrary
         /// </summary>
         private void Init()
         {
-            const bool isLocal = false;
+            const bool isLocal = true;
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (isLocal)
                 // ReSharper disable once HeuristicUnreachableCode
